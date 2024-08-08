@@ -1,3 +1,33 @@
+# Objektfiler og byggefiler
 *.o
+*.obj
+*.exe
+*.out
+*.a
+*.lib
+*.dll
+*.dylib
+*.so
 
-src/
+# Kataloger for byggefiler
+/build
+/bin
+/obj
+/tmp
+/Debug
+/Release
+
+# Katalogen src, inkludert alt i den
+/src/
+
+# VS Code spesifikke filer og mapper
+.vscode/
+
+# Kompilerte bin�rfiler
+*.class
+*.jar
+*.pyc
+*.pyo
+
+# Versjonskontroll-system spesifikke filer
+*.git
