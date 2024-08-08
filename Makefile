@@ -1,5 +1,5 @@
 # Definer kildefilene
-SOURCES = main.cpp function.cpp
+SOURCES = main.cpp function.cpp Game.cpp
 # Definer objektfilene
 OBJECTS = $(SOURCES:.cpp=.o)
 # Definer navnet på den endelige kjørbare filen

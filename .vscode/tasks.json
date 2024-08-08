@@ -7,7 +7,7 @@
             "command": "g++",
             "args": [
                 "-I", "src/include",
-                "main.cpp", "function.cpp",
+                "main.cpp", "function.cpp", "Game.cpp", 
                 "-o", "${workspaceFolder}/main.exe",
                 "-L", "src/lib",
                 "-lmingw32", "-lSDL2main", "-lSDL2"
