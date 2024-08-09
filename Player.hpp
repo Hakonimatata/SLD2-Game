@@ -18,6 +18,7 @@ public:
 private:
     float posX, posY;     // Posisjon
     float speed;          // Hastighet i piksler per sekund
+    int spriteWidth, spriteHeight; // Width and height of sprite
     SDL_Rect spriteRect;  // SDL_Rect for rendering
     SDL_Texture* playerTexture;
 
