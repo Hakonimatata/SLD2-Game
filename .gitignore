@@ -5,20 +5,16 @@
 *.out
 *.a
 *.lib
-*.dll
+# *.dll
 *.dylib
 *.so
 
 # Kataloger for byggefiler
 /build
-/bin
 /obj
 /tmp
 /Debug
 /Release
-
-# Katalogen src, inkludert alt i den
-/src/
 
 # VS Code spesifikke filer og mapper
 .vscode/
