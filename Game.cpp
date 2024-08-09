@@ -3,6 +3,7 @@
 
 using namespace std;
 
+SDL_Texture* playerTexture;
 
 Game::Game()
 { 
@@ -53,6 +54,11 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     {
         isRunning = false;
     }
+
+    SDL_Surface* tempSurface = IMG_Load("assets/Thermos.png");
+    playerTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+    SDL_FreeSurface(tempSurface);
+
 }
 
 void Game::handleEvents()
@@ -82,6 +88,7 @@ void Game::render()
     SDL_RenderClear(renderer);
 
     // Add to renderer here
+    SDL_RenderCopy(renderer, playerTexture, NULL, NULL);
 
     // Render to screen
     SDL_RenderPresent(renderer);
