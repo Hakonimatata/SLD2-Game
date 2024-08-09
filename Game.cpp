@@ -5,10 +5,7 @@ using namespace std;
 
 SDL_Texture* playerTexture;
 
-Game::Game()
-{ 
-
-}
+Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), player(nullptr), lastFrameTime(0) {}
 
 Game::~Game()
 {
@@ -17,7 +14,6 @@ Game::~Game()
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
 {
-
     int flags = 0;
     if(fullscreen)
     {
@@ -30,34 +26,32 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
         cout << "SDL init success" << endl;
 
         window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
-
         if (!window)
         {
             cout << "Window creation failed: " << SDL_GetError() << endl;
             isRunning = false;
         }
 
-        renderer = SDL_CreateRenderer(window, -1, 0);
-        
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
         if (!renderer)
         {
             cout << "Renderer creation failed: " << SDL_GetError() << endl;
             isRunning = false;
         }
         
-        // Draw a white canvas
+        // Draw a white background
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 
 
+        // Initialize player
+        player = new Player(100.0f, 100.0f, 200.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
+
         isRunning = true;
+        lastFrameTime = SDL_GetTicks();
     }
     else
     {
         isRunning = false;
-    }
-
-    SDL_Surface* tempSurface = IMG_Load("assets/Thermos.png");
-    playerTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
-    SDL_FreeSurface(tempSurface);
+    }  
 
 }
 
@@ -78,8 +72,14 @@ void Game::handleEvents()
 
 void Game::update()
 {
+    // Get current delta time. This is used for smooth movement
+    float deltaTime = getDeltaTime();
+
+    // Oppdater player
+    player->Update(deltaTime);
 
 }
+
 
 
 void Game::render()
@@ -88,7 +88,9 @@ void Game::render()
     SDL_RenderClear(renderer);
 
     // Add to renderer here
-    SDL_RenderCopy(renderer, playerTexture, NULL, NULL);
+    
+    // Render player
+    player->Render(renderer);
 
     // Render to screen
     SDL_RenderPresent(renderer);
@@ -101,4 +103,19 @@ void Game::clean()
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
     cout << "Game cleaned" << endl;
+}
+
+
+
+
+
+
+// Helper function to calculate delta time
+float Game::getDeltaTime()
+{
+    Uint32 currentTime = SDL_GetTicks();
+    float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // Konverter fra millisekunder til sekunder
+    lastFrameTime = currentTime;
+
+    return deltaTime;
 }

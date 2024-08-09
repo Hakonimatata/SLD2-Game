@@ -1,6 +1,8 @@
 #include "SDL2/SDL.h"
 #include <stdio.h>
 #include "SDL_image.h"
+#include "Player.hpp"
+
 
 using namespace std;
 
@@ -21,9 +23,16 @@ public:
     bool running(){ return isRunning; }
 
 private:
+
+    float getDeltaTime();
     
     bool isRunning;
     SDL_Window* window;
     SDL_Renderer* renderer;
+   
+    Player* player;
 
+    
+
+    Uint32 lastFrameTime;
 };
