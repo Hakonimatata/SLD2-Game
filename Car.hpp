@@ -29,9 +29,8 @@ public:
 
 private:
     // Physical properties
-    int size = 50;
-    float acceleration = 0.4f;
-    const float topSpeed = 10.0f;
+    float acceleration = 0.2f;
+    const float topSpeed = 6.0f;
     FloatPoint velocity = {0.0f, 0.0f};
     float rotationSpeed = 0.2f;
     float friction = 0.05f;
@@ -39,7 +38,9 @@ private:
 
     bool isAccelerating = false;
     bool isDrifting = false;
-    float tractionPercentage = 1.0f; // between 0 and 1. 1 is good traction
+    float tractionPercentage = 1.0f; // between 0 and 1. 1 is perfect traction
+    void UpdateTractionPercentage();
+
 
     float posX, posY;     // Posisjon
     float speed;          // Hastighet i piksler per sekund

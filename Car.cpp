@@ -6,8 +6,8 @@ using namespace std;
 
 Car::Car(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(y), speed(speed) 
 {
-    spriteWidth = 50;
-    spriteHeight = 120;
+    spriteWidth = 25;
+    spriteHeight = 60;
     
     spriteRect.w = spriteWidth;
     spriteRect.h = spriteHeight;
@@ -61,8 +61,10 @@ void Car::HandleInput(const Uint8 *state)
 
 void Car::Update(float deltaTime)
 {
+    
     // Update velocity
     Slide();
+    
 
     // Oppdater sprite rectange for rendering
     spriteRect.x = static_cast<int>(posX);
@@ -116,27 +118,9 @@ void Car::Reverse()
 
 void Car::Slide()
 {
-    // TODO: Make function getTractionPercentage()
-    if(isDrifting)
-    {
-        // Reduce traction percentage
-        tractionPercentage -= 0.04f;
 
-        float cap = 0.2f;
-        if(tractionPercentage < cap)
-        {
-            tractionPercentage = cap;
-        }
-    }
-    else
-    {
-        // Increase traction percentage
-        tractionPercentage += 0.08f;
-        if(tractionPercentage > 1.0f)
-        {
-            tractionPercentage = 1.0f;
-        }
-    }
+    // Update grip/traction. 1 is full traction, 0 is no grip
+    UpdateTractionPercentage();
 
     // Move in direction of speed
     posX += velocity.x * (1 - tractionPercentage);
@@ -149,18 +133,18 @@ void Car::Slide()
 
     if(!isAccelerating)
     {
-        // Apply friction
+        // Apply friction for automatic breaking
         velocity.x -= velocity.x * friction;
         velocity.y -= velocity.y * friction;
     }
 
     //TODO: make function restrictToTopSpeed()
     // Begrens hastigheten for å unngå å overskride topSpeed
-    float speed = sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-    if (speed > topSpeed)
+     if (velocity.getSize() > topSpeed)
     {
-        velocity.x = (velocity.x / speed) * topSpeed;
-        velocity.y = (velocity.y / speed) * topSpeed;
+        velocity.normalize();
+        velocity.x *= topSpeed;
+        velocity.y *= topSpeed;
     }
 
 }
@@ -207,4 +191,28 @@ float Car::GetAngleSpeed()
 
     return adjustedRotationSpeed * GetTopSpeedPercentage();
     
+}
+
+void Car::UpdateTractionPercentage()
+{
+    if(isDrifting)
+    {
+        // Reduce traction percentage
+        tractionPercentage -= 0.04f;
+
+        float cap = 0.2f;
+        if(tractionPercentage < cap)
+        {
+            tractionPercentage = cap;
+        }
+    }
+    else
+    {
+        // Increase traction percentage
+        tractionPercentage += 0.04f;
+        if(tractionPercentage > 1.0f)
+        {
+            tractionPercentage = 1.0f;
+        }
+    }
 }
