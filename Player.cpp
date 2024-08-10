@@ -1,6 +1,9 @@
 #include "Player.hpp"
+#include <iostream>
 
-Player::Player(float x, float y, float speed) : posX(x), posY(y), speed(speed) 
+using namespace std;
+
+Player::Player(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(y), speed(speed) 
 {
     spriteWidth = 100;
     spriteHeight = 100;
@@ -10,28 +13,49 @@ Player::Player(float x, float y, float speed) : posX(x), posY(y), speed(speed)
 
     spriteRect.x = static_cast<int>(posX);
     spriteRect.y = static_cast<int>(posY);
+
+    // Load texture
+    SDL_Surface* tempSurface = IMG_Load("assets/Thermos.png");
+    if(tempSurface == NULL) {cout << "Failed to load surface: " << SDL_GetError() << endl;}
+    playerTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+    SDL_FreeSurface(tempSurface);
+    if(playerTexture == NULL) {cout << "Failed to load texture: " << SDL_GetError() << endl;}
 }
 
 Player::~Player() {
-    // Rydd opp om nødvendig
+    // Clean up
+    if(playerTexture != NULL) {SDL_DestroyTexture(playerTexture);}
 }
 
-void Player::Update(float deltaTime) {
-    // Oppdater posisjon basert på hastighet og delta-tid
-    posX += speed * deltaTime;
-    posY += speed * deltaTime;
+void Player::HandleInput(const Uint8 *state)
+{
+    // Move left
+    if (state[SDL_SCANCODE_LEFT]) {
+        posX -= speed;
+    }
+    // Move right
+    if (state[SDL_SCANCODE_RIGHT]) {
+        posX += speed;
+    }
+    // Move up
+    if (state[SDL_SCANCODE_UP]) {
+        posY -= speed;
+    }
+    // Move down
+    if (state[SDL_SCANCODE_DOWN]) {
+        posY += speed;
+    }
+}
 
-    // Oppdater spriteRect for rendering
+void Player::Update(float deltaTime)
+{
+    // Oppdater sprite rectange for rendering
     spriteRect.x = static_cast<int>(posX);
     spriteRect.y = static_cast<int>(posY);
 }
 
 void Player::Render(SDL_Renderer* renderer) {
-    // Legger til player texture
-    SDL_Surface* tempSurface = IMG_Load("assets/Thermos.png");
-    playerTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
-    SDL_FreeSurface(tempSurface);
-    
+    // Draw player texture
     SDL_RenderCopy(renderer, playerTexture, NULL, &spriteRect);
 }
 

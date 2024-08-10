@@ -6,9 +6,10 @@
 
 class Player {
 public:
-    Player(float x, float y, float speed);
+    Player(SDL_Renderer* renderer, float x, float y, float speed);
     ~Player();
 
+    void HandleInput(const Uint8* state);
     void Update(float deltaTime);
     void Render(SDL_Renderer* renderer);
 

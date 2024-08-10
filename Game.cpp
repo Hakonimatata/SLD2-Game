@@ -41,7 +41,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 
 
         // Initialize player
-        player = new Player(100.0f, 100.0f, 200.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
+        player = new Player(renderer, 100.0f, 100.0f, 10.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
 
         isRunning = true;
         lastFrameTime = SDL_GetTicks();
@@ -66,6 +66,10 @@ void Game::handleEvents()
     default:
         break;
     }
+
+    // Get player input from keyboard
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    player->HandleInput(state);
 }
 
 void Game::update()
