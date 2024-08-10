@@ -3,8 +3,6 @@
 
 using namespace std;
 
-SDL_Texture* playerTexture;
-
 Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), player(nullptr), lastFrameTime(0) {}
 
 Game::~Game()
