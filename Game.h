@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "SDL_image.h"
 #include "Player.hpp"
+#include "Car.hpp"
 
 
 using namespace std;
@@ -24,14 +25,20 @@ public:
 
 private:
 
+    int WinW;
+    int WinH;
+
     float getDeltaTime();
     
     bool isRunning;
     SDL_Window* window;
     SDL_Renderer* renderer;
    
-    Player* player;
+    Car* player;
 
+
+    SDL_Rect backgroundSpriteRect; 
+    SDL_Texture* backgroundTexture;
     
 
     Uint32 lastFrameTime;

@@ -3,7 +3,16 @@
 
 using namespace std;
 
-Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), player(nullptr), lastFrameTime(0) {}
+Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), player(nullptr), lastFrameTime(0) 
+{
+
+    backgroundSpriteRect.h = 600;
+    backgroundSpriteRect.w = 800;
+    backgroundSpriteRect.x = 0;
+    backgroundSpriteRect.y = 0;
+
+    
+}
 
 Game::~Game()
 {
@@ -12,7 +21,7 @@ Game::~Game()
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
 {
-    int flags = 0;
+    int flags = SDL_WINDOW_RESIZABLE;
     if(fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
@@ -40,8 +49,18 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
         // Draw a white background
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 
 
+        // Init background texture
+        SDL_Surface* tempSurface = IMG_Load("assets/RaceTrack.png");
+        if(tempSurface == NULL) {cout << "Failed to load surface: " << SDL_GetError() << endl;}
+        backgroundTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+        SDL_FreeSurface(tempSurface);
+        if(backgroundTexture == NULL) {cout << "Failed to load texture: " << SDL_GetError() << endl;}
+
+
+
         // Initialize player
-        player = new Player(renderer, 100.0f, 100.0f, 10.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
+        // player = new Player(renderer, 100.0f, 100.0f, 10.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
+        player = new Car(renderer, 100.0f, 100.0f, 10.0f);
 
         isRunning = true;
         lastFrameTime = SDL_GetTicks();
@@ -62,6 +81,20 @@ void Game::handleEvents()
     {
     case SDL_QUIT:
         isRunning = false;
+        break;
+
+    case SDL_WINDOWEVENT:
+        if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+        {
+            int newWidth = event.window.data1;
+            int newHeight = event.window.data2;
+
+            // update variables
+            WinW = newWidth;
+            WinH = newHeight;
+            backgroundSpriteRect.h = newHeight;
+            backgroundSpriteRect.w = newWidth;
+        }
         break;
     default:
         break;
@@ -91,8 +124,13 @@ void Game::render()
 
     // Add to renderer here
     
+    // Render background
+    SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundSpriteRect);
+
     // Render player
     player->Render(renderer);
+
+    
 
     // Render to screen
     SDL_RenderPresent(renderer);
