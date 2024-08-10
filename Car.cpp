@@ -30,7 +30,7 @@ Car::~Car() {
 
 void Car::HandleInput(const Uint8 *state)
 {
-    if (state[SDL_SCANCODE_D]) {
+    if (state[SDL_SCANCODE_D] && (velocity.getSize() > 0.7 * topSpeed || state[SDL_SCANCODE_UP]) ) {
         isDrifting = true;
     } else {isDrifting = false;}
 
@@ -103,6 +103,9 @@ void Car::Accelerate()
 
 void Car::Reverse()
 {
+    // Todo: Fix reverse. It only breaks the car at the moment
+
+    /*
     float reverseAccel = -0.5f * acceleration;
     velocity.x += reverseAccel * cos(angle);
     velocity.y += reverseAccel * sin(angle);
@@ -114,40 +117,104 @@ void Car::Reverse()
         velocity.x *= topSpeed;
         velocity.y *= topSpeed;
     }
+    */
+
+   // Apply friction for  breaking
+    velocity.x -= velocity.x * friction * 10;
+    velocity.y -= velocity.y * friction * 10;
+
+
+}
+
+
+void Car::UpdateTractionPercentage()
+{
+    const float adjustmentSpeed = 0.04f;
+    const float minTraction = 0.4f;
+    const float maxTraction = 1.0f;
+
+    if(isDrifting)
+    {
+        tractionPercentage -= adjustmentSpeed;
+        if(tractionPercentage < minTraction)
+        {
+            tractionPercentage = minTraction;
+        }
+    }
+    else
+    {
+        tractionPercentage += adjustmentSpeed;
+        if(tractionPercentage > maxTraction)
+        {
+            tractionPercentage = maxTraction;
+        }
+    }
 }
 
 void Car::Slide()
 {
-
-    // Update grip/traction. 1 is full traction, 0 is no grip
+    // Oppdater grep/trekkraft
     UpdateTractionPercentage();
 
-    // Move in direction of speed
+    // Gradvis juster fartsvektoren mot bilens retning
+    // if(!isDrifting)
+    {
+        AdjustVelocityTowardsAngle(); // 0.05 = LERP factor. Lower => smoother transition
+    }
+
+    // Oppdater posisjon basert på den nåværende hastigheten
+    UpdatePosition();
+
+    // Påfør friksjon hvis bilen ikke akselererer
+    if(!isAccelerating)
+    {
+        ApplyFriction();
+    }
+
+    // Begrens hastigheten til topSpeed
+    RestrictSpeedToTopSpeed();
+}
+
+void Car::AdjustVelocityTowardsAngle()
+{
+    float lerpFactor = 0.01f;
+
+    float targetVelocityX = cos(angle) * velocity.getSize();
+    float targetVelocityY = sin(angle) * velocity.getSize();
+
+    // Gradvis juster hastigheten mot målretningen ved hjelp av LERP
+    velocity.x += lerpFactor * (targetVelocityX - velocity.x);
+    velocity.y += lerpFactor * (targetVelocityY - velocity.y);
+}
+
+void Car::UpdatePosition()
+{
+    // Bevegelse i fartsretningen (reduksjon av trekkraft)
     posX += velocity.x * (1 - tractionPercentage);
     posY += velocity.y * (1 - tractionPercentage);
 
-    // Move in direction of car angle
-    // TODO: fix!
+    // Bevegelse i bilens retning (økt trekkraft)
     posX += velocity.getSize() * cos(angle) * tractionPercentage;
     posY += velocity.getSize() * sin(angle) * tractionPercentage;
+}
 
-    if(!isAccelerating)
-    {
-        // Apply friction for automatic breaking
-        velocity.x -= velocity.x * friction;
-        velocity.y -= velocity.y * friction;
-    }
+void Car::ApplyFriction()
+{
+    velocity.x -= velocity.x * friction;
+    velocity.y -= velocity.y * friction;
+}
 
-    //TODO: make function restrictToTopSpeed()
-    // Begrens hastigheten for å unngå å overskride topSpeed
-     if (velocity.getSize() > topSpeed)
+void Car::RestrictSpeedToTopSpeed()
+{
+    if (velocity.getSize() > topSpeed)
     {
         velocity.normalize();
         velocity.x *= topSpeed;
         velocity.y *= topSpeed;
     }
-
 }
+
+
 
 void Car::RotateLeft()
 {
@@ -186,33 +253,9 @@ float Car::GetAngleSpeed()
     
     if(isDrifting)
     {
-        adjustedRotationSpeed *= 1.5f;
+        adjustedRotationSpeed *= 1.8f;
     }
 
     return adjustedRotationSpeed * GetTopSpeedPercentage();
     
-}
-
-void Car::UpdateTractionPercentage()
-{
-    if(isDrifting)
-    {
-        // Reduce traction percentage
-        tractionPercentage -= 0.04f;
-
-        float cap = 0.2f;
-        if(tractionPercentage < cap)
-        {
-            tractionPercentage = cap;
-        }
-    }
-    else
-    {
-        // Increase traction percentage
-        tractionPercentage += 0.04f;
-        if(tractionPercentage > 1.0f)
-        {
-            tractionPercentage = 1.0f;
-        }
-    }
 }

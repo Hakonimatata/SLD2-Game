@@ -21,6 +21,10 @@ public:
     void Accelerate();
     void Reverse();
     void Slide();
+    void AdjustVelocityTowardsAngle();
+    void UpdatePosition();
+    void ApplyFriction();
+    void RestrictSpeedToTopSpeed();
     void RotateLeft();
     void RotateRight();
 
@@ -33,7 +37,7 @@ private:
     const float topSpeed = 6.0f;
     FloatPoint velocity = {0.0f, 0.0f};
     float rotationSpeed = 0.2f;
-    float friction = 0.05f;
+    float friction = 0.01f;
     float angle = 0.0f;
 
     bool isAccelerating = false;
