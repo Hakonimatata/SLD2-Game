@@ -22,8 +22,9 @@ public:
 
     // Boost functionality
     void StartBoost(float multiplier, float duration);
+    void ApplyBoost();
 
-    void ScaleEverything(float scaleFactor);
+    void ScaleEverything(float scaleFactor); // Scales sprites, top speed, acceleration, friction, etc.
 
 private:
     void Accelerate();
@@ -32,16 +33,17 @@ private:
     void RotateRight();
 
     // Helper functions
+    void UpdateTractionPercentage();
     void AdjustVelocityTowardsAngle();
     void UpdatePosition();
     void ApplyFriction();
     void RestrictSpeedToTopSpeed();
     float GetTopSpeedPercentage();
     float GetAngleSpeed();
-    void UpdateTractionPercentage();
 
     // Physical properties adjustable by user
-    float acceleration = 0.2f;
+    float physicsSpeedFactor = 75.0f; // Multiplier for delta time => speed of all physics
+    float acceleration = 0.2f; 
     float topSpeed;
     float rotationSpeed = 0.2f;  // Fart bilen roterer. Eks 0 hvis står stille
     float friction = 0.01f;      // Hvor mye bilen automatisk bremser når man ikke akselererer
@@ -53,6 +55,7 @@ private:
     bool isDrifting = false;
     float tractionPercentage = 1.0f;  // between 0 and 1. 1 is perfect traction
     float posX, posY;  // Posisjon
+    float deltaTime;
 
     // SDL properties
     int spriteWidth = 40; 
@@ -66,7 +69,6 @@ private:
     float boostDuration;      // Hvor lenge boosten varer
     float boostElapsedTime;   // Tid som har gått siden boosten startet
     float normalTopSpeed;     // Lagre den normale toppfarten
-    void ApplyBoost(float deltaTime);
 };
 
 #endif // CAR_HPP

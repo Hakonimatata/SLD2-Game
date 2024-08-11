@@ -78,6 +78,8 @@ void Car::HandleInput(const Uint8* state, const PlayerControls& controls)
 
 void Car::Update(float deltaTime)
 {
+    // get current delta time from game class
+    this->deltaTime = deltaTime * physicsSpeedFactor;
     
     // Oppdater grep/trekkraft gradvis ut ifra drift knapp
     UpdateTractionPercentage();
@@ -96,7 +98,7 @@ void Car::Update(float deltaTime)
 
     if(isBoosting)
     {
-        ApplyBoost(deltaTime); // Deltatime used for duration
+        ApplyBoost(); // Deltatime used for duration
     }
 
 
@@ -156,8 +158,8 @@ void Car::ScaleEverything(float scaleFactor)
 void Car::Accelerate()
 {
     // Apply acceleration only in direction of car
-    velocity.x += acceleration * cos(angle);
-    velocity.y += acceleration * sin(angle);
+    velocity.x += acceleration * cos(angle) * deltaTime;
+    velocity.y += acceleration * sin(angle) * deltaTime;
 }
 
 void Car::Reverse()
@@ -179,8 +181,8 @@ void Car::Reverse()
     */
 
    // Apply friction for  breaking
-    velocity.x -= velocity.x * friction * 10;
-    velocity.y -= velocity.y * friction * 10;
+    velocity.x -= velocity.x * friction * 10 * deltaTime;
+    velocity.y -= velocity.y * friction * 10 * deltaTime;
 
 
 }
@@ -194,7 +196,7 @@ void Car::UpdateTractionPercentage()
 
     if(isDrifting)
     {
-        tractionPercentage -= 0.1f;
+        tractionPercentage -= 0.1f * deltaTime;
         if(tractionPercentage < minTraction)
         {
             tractionPercentage = minTraction;
@@ -202,7 +204,7 @@ void Car::UpdateTractionPercentage()
     }
     else
     {
-        tractionPercentage += adjustmentSpeed;
+        tractionPercentage += adjustmentSpeed * deltaTime;
         if(tractionPercentage > maxTraction)
         {
             tractionPercentage = maxTraction;
@@ -210,7 +212,7 @@ void Car::UpdateTractionPercentage()
     }
 }
 
-void Car::ApplyBoost(float deltaTime)
+void Car::ApplyBoost()
 {
     if (isBoosting)
     {
@@ -235,7 +237,7 @@ void Car::ApplyBoost(float deltaTime)
 
 void Car::AdjustVelocityTowardsAngle()
 {
-    float lerpFactor = tractionPercentage;
+    float lerpFactor = tractionPercentage * deltaTime;
 
     float targetVelocityX = cos(angle) * velocity.getSize();
     float targetVelocityY = sin(angle) * velocity.getSize();
@@ -248,14 +250,14 @@ void Car::AdjustVelocityTowardsAngle()
 void Car::UpdatePosition()
 
 {
-    posX += velocity.x;
-    posY += velocity.y;
+    posX += velocity.x * deltaTime;
+    posY += velocity.y * deltaTime;
 }
 
 void Car::ApplyFriction()
 {
-    velocity.x -= velocity.x * friction;
-    velocity.y -= velocity.y * friction;
+    velocity.x -= velocity.x * friction * deltaTime;
+    velocity.y -= velocity.y * friction * deltaTime;
 }
 
 void Car::RestrictSpeedToTopSpeed()
@@ -272,7 +274,7 @@ void Car::RestrictSpeedToTopSpeed()
 
 void Car::RotateLeft()
 {
-    float angleSpeed = GetAngleSpeed();
+    float angleSpeed = GetAngleSpeed() * deltaTime;
 
     angle -= angleSpeed;
     
@@ -284,7 +286,7 @@ void Car::RotateLeft()
 
 void Car::RotateRight()
 {
-    float angleSpeed = GetAngleSpeed();
+    float angleSpeed = GetAngleSpeed() * deltaTime;
 
     angle += angleSpeed;
 
@@ -307,7 +309,7 @@ float Car::GetAngleSpeed()
     
     if(isDrifting)
     {
-        adjustedRotationSpeed *= 1.8f;
+        adjustedRotationSpeed *= 1.5f; // Apply factor for extra rotation when drifting
     }
 
     return adjustedRotationSpeed * GetTopSpeedPercentage();
