@@ -24,67 +24,112 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 {
     this->twoPlayerMode = twoPlayerMode;
 
-    int flags = SDL_WINDOW_RESIZABLE;
-    if(fullscreen)
-    {
-        flags = SDL_WINDOW_FULLSCREEN;
-    }
-
-    // Initialize SDL
-    if(SDL_Init(SDL_INIT_EVERYTHING) == 0)
-    {
-        cout << "SDL init success" << endl;
-
-        window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
-        if (!window)
-        {
-            cout << "Window creation failed: " << SDL_GetError() << endl;
-            isRunning = false;
-        }
-
-        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        if (!renderer)
-        {
-            cout << "Renderer creation failed: " << SDL_GetError() << endl;
-            isRunning = false;
-        }
-        
-        // Draw a white background
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); 
-
-        // Init background texture
-        SDL_Surface* tempSurface = IMG_Load("assets/RaceTrack.png");
-        if(tempSurface == NULL) {cout << "Failed to load surface: " << SDL_GetError() << endl;}
-        backgroundTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
-        SDL_FreeSurface(tempSurface);
-        if(backgroundTexture == NULL) {cout << "Failed to load texture: " << SDL_GetError() << endl;}
-
-
-
-        // Initialize player(s)
-        players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png");
-
-        if(twoPlayerMode)
-        {
-            players[1] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar2.png");
-        }
-        // Set player controls
-        playerControls[0] = {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_RCTRL};
-
-        if(twoPlayerMode)
-        {
-            playerControls[1] = {SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_LSHIFT};
-        }
-        
-
-        isRunning = true;
-        lastFrameTime = SDL_GetTicks();
-    }
-    else
+    if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {
         isRunning = false;
-    }  
+        return;
+    }
 
+    if (!loadBackgroundTexture("assets/RaceTrack.png"))
+    {
+        isRunning = false;
+        return;
+    }
+
+    initPlayers();
+    initPlayerControls();
+
+    isRunning = true;
+    lastFrameTime = SDL_GetTicks();
+}
+
+bool Game::initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
+{
+    int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        cout << "SDL init failed: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    cout << "SDL init success" << endl;
+
+    window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
+    if (!window)
+    {
+        cout << "Window creation failed: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer)
+    {
+        cout << "Renderer creation failed: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    // Draw a white background
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    return true;
+}
+
+bool Game::loadBackgroundTexture(const std::string& filepath)
+{
+    SDL_Surface* tempSurface = IMG_Load(filepath.c_str());
+    if (!tempSurface)
+    {
+        cout << "Failed to load surface: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    backgroundTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
+    SDL_FreeSurface(tempSurface);
+
+    if (!backgroundTexture)
+    {
+        cout << "Failed to load texture: " << SDL_GetError() << endl;
+        return false;
+    }
+
+    return true;
+}
+
+void Game::initPlayers()
+{
+    players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png");
+
+    if (twoPlayerMode)
+    {
+        players[1] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar2.png");
+    }
+}
+
+void Game::initPlayerControls()
+{
+    playerControls[0] = 
+    {
+        SDL_SCANCODE_UP,     // Accelerate
+        SDL_SCANCODE_DOWN,   // Reverse
+        SDL_SCANCODE_LEFT,   // Turn left
+        SDL_SCANCODE_RIGHT,  // Turn right
+        SDL_SCANCODE_RCTRL,  // Drift
+        SDL_SCANCODE_PERIOD  // Boost
+    };
+
+    if (twoPlayerMode)
+    {
+        playerControls[1] = 
+        {
+            SDL_SCANCODE_W,      // Accelerate
+            SDL_SCANCODE_S,      // Reverse
+            SDL_SCANCODE_A,      // Turn left
+            SDL_SCANCODE_D,      // Turn right
+            SDL_SCANCODE_LCTRL,  // Drift
+            SDL_SCANCODE_LSHIFT  // Boost
+        };
+    }
 }
 
 void Game::handleEvents()
@@ -103,12 +148,10 @@ void Game::handleEvents()
         {
             int newWidth = event.window.data1;
             int newHeight = event.window.data2;
-
-            // update variables
             WinW = newWidth;
             WinH = newHeight;
-            backgroundSpriteRect.h = newHeight;
-            backgroundSpriteRect.w = newWidth;
+
+            resizeElements(newWidth, newHeight);
         }
         break;
     default:
@@ -162,6 +205,13 @@ void Game::clean()
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
     cout << "Game cleaned" << endl;
+}
+
+void Game::resizeElements(int width, int height)
+{
+    // Resize background
+    backgroundSpriteRect.h = height;
+    backgroundSpriteRect.w = width;
 }
 
 // Helper function to calculate delta time

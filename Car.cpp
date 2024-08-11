@@ -44,6 +44,11 @@ void Car::HandleInput(const Uint8* state, const PlayerControls& controls)
         isDrifting = false;
     }
 
+    // Boost
+    if (state[controls.boost]) {
+        StartBoost(1.5f, 0.5f);
+    }
+
     // Turn left
     if (state[controls.turnLeft]) {
         RotateLeft();
@@ -87,6 +92,12 @@ void Car::Update(float deltaTime)
         ApplyFriction();
     }
 
+    if(isBoosting)
+    {
+        ApplyBoost(deltaTime);
+    }
+
+
     // Begrens hastigheten til topSpeed
     RestrictSpeedToTopSpeed();
 
@@ -110,6 +121,19 @@ void Car::SetPosition(float x, float y) {
 
 void Car::SetSpeed(float newSpeed) {
     topSpeed = newSpeed;
+}
+
+void Car::StartBoost(float multiplier, float duration)
+{
+    if (!isBoosting)
+    {
+        isBoosting = true;
+        boostMultiplier = multiplier;
+        boostDuration = duration;
+        boostElapsedTime = 0.0f;
+        normalTopSpeed = topSpeed;
+        topSpeed *= boostMultiplier;  // Øk toppfarten midlertidig
+    }
 }
 
 void Car::Accelerate()
@@ -168,6 +192,29 @@ void Car::UpdateTractionPercentage()
         }
     }
 }
+
+void Car::ApplyBoost(float deltaTime)
+{
+    if (isBoosting)
+    {
+        boostElapsedTime += deltaTime;
+
+        // Hvis boosten er over, begynn å gradvis gå tilbake til normal toppfart
+        if (boostElapsedTime >= boostDuration)
+        {
+            float lerpFactor = (boostElapsedTime - boostDuration) / boostDuration;
+            topSpeed = normalTopSpeed + (boostMultiplier * normalTopSpeed - normalTopSpeed) * (1.0f - lerpFactor);
+
+            // Hvis toppfarten er tilnærmet lik normal toppfart, avslutt boosten
+            if (topSpeed <= normalTopSpeed + 0.01f) 
+            {
+                topSpeed = normalTopSpeed;  // Tilbakestill toppfarten helt
+                isBoosting = false;  // Avslutt boost
+            }
+        }
+    }
+}
+
 
 void Car::AdjustVelocityTowardsAngle()
 {

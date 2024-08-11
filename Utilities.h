@@ -14,4 +14,5 @@ struct PlayerControls {
     SDL_Scancode turnLeft;
     SDL_Scancode turnRight;
     SDL_Scancode drift;
+    SDL_Scancode boost;
 };

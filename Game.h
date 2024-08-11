@@ -3,6 +3,7 @@
 #include "SDL_image.h"
 #include "Player.hpp"
 #include "Car.hpp"
+#include <string>
 
 
 using namespace std;
@@ -21,11 +22,17 @@ public:
     void render();
     void clean();
 
-    void HandleInputForPlayer2(const Uint8 *state);
-
     bool running(){ return isRunning; }
 
+    void resizeElements(int width, int height);
+
 private:
+
+    bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
+    bool loadBackgroundTexture(const std::string& filepath);
+    void initPlayers();
+    void initPlayerControls();
+
 
     int WinW;
     int WinH;
