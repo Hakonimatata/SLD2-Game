@@ -1,9 +1,10 @@
 #include "Game.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
-Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), player(nullptr), lastFrameTime(0) 
+Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), lastFrameTime(0) 
 {
 
     backgroundSpriteRect.h = 600;
@@ -19,8 +20,10 @@ Game::~Game()
     clean();
 }
 
-void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
+void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen, bool twoPlayerMode)
 {
+    this->twoPlayerMode = twoPlayerMode;
+
     int flags = SDL_WINDOW_RESIZABLE;
     if(fullscreen)
     {
@@ -58,8 +61,21 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
 
 
-        // Initialize player
-        player = new Car(renderer, 100.0f, 100.0f, 7.0f);
+        // Initialize player(s)
+        players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png");
+
+        if(twoPlayerMode)
+        {
+            players[1] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar2.png");
+        }
+        // Set player controls
+        playerControls[0] = {SDL_SCANCODE_UP, SDL_SCANCODE_DOWN, SDL_SCANCODE_LEFT, SDL_SCANCODE_RIGHT, SDL_SCANCODE_RCTRL};
+
+        if(twoPlayerMode)
+        {
+            playerControls[1] = {SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D, SDL_SCANCODE_LSHIFT};
+        }
+        
 
         isRunning = true;
         lastFrameTime = SDL_GetTicks();
@@ -101,7 +117,11 @@ void Game::handleEvents()
 
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
-    player->HandleInput(state);
+
+    // Handle input for all players
+    for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
+        players[i]->HandleInput(state, playerControls[i]);
+    }
 }
 
 void Game::update()
@@ -109,9 +129,9 @@ void Game::update()
     // Get current delta time. This is used for smooth movement
     float deltaTime = getDeltaTime();
 
-    // Oppdater player
-    player->Update(deltaTime);
-
+    // Update player
+    players[0]->Update(deltaTime);
+    if(twoPlayerMode) {players[1]->Update(deltaTime);}
 }
 
 
@@ -127,8 +147,8 @@ void Game::render()
     SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundSpriteRect);
 
     // Render player
-    player->Render(renderer);
-
+    players[0]->Render(renderer);
+    if(twoPlayerMode) {players[1]->Render(renderer);}
     
 
     // Render to screen
@@ -143,11 +163,6 @@ void Game::clean()
     SDL_Quit();
     cout << "Game cleaned" << endl;
 }
-
-
-
-
-
 
 // Helper function to calculate delta time
 float Game::getDeltaTime()

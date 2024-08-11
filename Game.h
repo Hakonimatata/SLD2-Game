@@ -14,12 +14,14 @@ public:
     Game();
     ~Game();
 
-    void init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
+    void init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen, bool twoPlayerMode);
     
     void handleEvents();
     void update();
     void render();
     void clean();
+
+    void HandleInputForPlayer2(const Uint8 *state);
 
     bool running(){ return isRunning; }
 
@@ -33,8 +35,10 @@ private:
     bool isRunning;
     SDL_Window* window;
     SDL_Renderer* renderer;
-   
-    Car* player;
+    
+    PlayerControls playerControls[2];
+    Car* players[2];
+    bool twoPlayerMode;
 
 
     SDL_Rect backgroundSpriteRect; 
@@ -43,3 +47,4 @@ private:
 
     Uint32 lastFrameTime;
 };
+

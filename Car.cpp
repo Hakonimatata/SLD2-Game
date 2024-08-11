@@ -1,10 +1,13 @@
 #include "Car.hpp"
 #include <iostream>
 #include <math.h>
+#include <string>
+
 
 using namespace std;
 
-Car::Car(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(y), topSpeed(speed) 
+Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile) 
+    : posX(x), posY(y), topSpeed(speed)
 {
     spriteWidth = 25;
     spriteHeight = 60;
@@ -15,49 +18,56 @@ Car::Car(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(
     spriteRect.x = static_cast<int>(posX);
     spriteRect.y = static_cast<int>(posY);
 
-    // Load texture
-    SDL_Surface* tempSurface = IMG_Load("assets/RaceCar2.png");
-    if(tempSurface == NULL) {cout << "Failed to load surface: " << SDL_GetError() << endl;}
+    // Load texture from the specified file
+    SDL_Surface* tempSurface = IMG_Load(textureFile.c_str());
+    if(tempSurface == NULL) {
+        cout << "Failed to load surface: " << IMG_GetError() << endl;
+    }
     texture = SDL_CreateTextureFromSurface(renderer, tempSurface);
     SDL_FreeSurface(tempSurface);
-    if(texture == NULL) {cout << "Failed to load texture: " << SDL_GetError() << endl;}
+    if(texture == NULL) {
+        cout << "Failed to load texture: " << SDL_GetError() << endl;
+    }
 }
+
 
 Car::~Car() {
     // Clean up
     if(texture != NULL) {SDL_DestroyTexture(texture);}
 }
 
-void Car::HandleInput(const Uint8 *state)
+void Car::HandleInput(const Uint8* state, const PlayerControls& controls)
 {
-    if (state[SDL_SCANCODE_D] && (velocity.getSize() > 0.7 * topSpeed || state[SDL_SCANCODE_UP]) ) {
+    if (state[controls.drift] && (velocity.getSize() > 0.7 * topSpeed || state[controls.accelerate]) ) {
         isDrifting = true;
-    } else {isDrifting = false;}
+    } else {
+        isDrifting = false;
+    }
 
     // Turn left
-    if (state[SDL_SCANCODE_LEFT]) {
+    if (state[controls.turnLeft]) {
         RotateLeft();
     }
 
     // Turn right
-    if (state[SDL_SCANCODE_RIGHT]) {
+    if (state[controls.turnRight]) {
         RotateRight();
     }
 
     // Accelerate
-    if (state[SDL_SCANCODE_UP]) {
+    if (state[controls.accelerate]) {
         isAccelerating = true;
         Accelerate();
-    } else {isAccelerating = false;}
-
-
-    // Reverse
-    if (state[SDL_SCANCODE_DOWN]) {
-        Reverse();
+    } else {
+        isAccelerating = false;
     }
 
-
+    // Reverse
+    if (state[controls.reverse]) {
+        Reverse();
+    }
 }
+
 
 void Car::Update(float deltaTime)
 {

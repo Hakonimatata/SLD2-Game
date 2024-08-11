@@ -5,13 +5,14 @@
 #include <SDL.h>
 #include "SDL_image.h"
 #include "Utilities.h"
+#include <string>
 
 class Car {
 public:
-    Car(SDL_Renderer* renderer, float x, float y, float speed);
+    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile);
     ~Car();
 
-    void HandleInput(const Uint8* state);
+    void HandleInput(const Uint8* state, const PlayerControls& controls);
     void Update(float deltaTime);
     void Render(SDL_Renderer* renderer);
 
