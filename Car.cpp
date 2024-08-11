@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Car::Car(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(y), speed(speed) 
+Car::Car(SDL_Renderer* renderer, float x, float y, float speed) : posX(x), posY(y), topSpeed(speed) 
 {
     spriteWidth = 25;
     spriteHeight = 60;
@@ -62,9 +62,24 @@ void Car::HandleInput(const Uint8 *state)
 void Car::Update(float deltaTime)
 {
     
-    // Update velocity
-    Slide();
-    
+    // Oppdater grep/trekkraft gradvis ut ifra drift knapp
+    UpdateTractionPercentage();
+
+    // Juster fartsvektoren mot bilens retning basert på tractionPercentage
+    AdjustVelocityTowardsAngle();
+
+    // Oppdater posisjon basert på den nåværende hastigheten
+    UpdatePosition();
+
+    // Påfør friksjon hvis bilen ikke akselererer
+    if(!isAccelerating)
+    {
+        ApplyFriction();
+    }
+
+    // Begrens hastigheten til topSpeed
+    RestrictSpeedToTopSpeed();
+
 
     // Oppdater sprite rectange for rendering
     spriteRect.x = static_cast<int>(posX);
@@ -84,21 +99,14 @@ void Car::SetPosition(float x, float y) {
 }
 
 void Car::SetSpeed(float newSpeed) {
-    speed = newSpeed;
+    topSpeed = newSpeed;
 }
 
 void Car::Accelerate()
 {
+    // Apply acceleration only in direction of car
     velocity.x += acceleration * cos(angle);
     velocity.y += acceleration * sin(angle);
-
-    // Restrict speed by top speeed
-    if (velocity.getSize() > topSpeed)
-    {
-        velocity.normalize();
-        velocity.x *= topSpeed;
-        velocity.y *= topSpeed;
-    }
 }
 
 void Car::Reverse()
@@ -129,13 +137,13 @@ void Car::Reverse()
 
 void Car::UpdateTractionPercentage()
 {
-    const float adjustmentSpeed = 0.04f;
-    const float minTraction = 0.4f;
+    const float adjustmentSpeed = 0.004f;
+    const float minTraction = 0.005f;
     const float maxTraction = 1.0f;
 
     if(isDrifting)
     {
-        tractionPercentage -= adjustmentSpeed;
+        tractionPercentage -= 0.1f;
         if(tractionPercentage < minTraction)
         {
             tractionPercentage = minTraction;
@@ -151,33 +159,9 @@ void Car::UpdateTractionPercentage()
     }
 }
 
-void Car::Slide()
-{
-    // Oppdater grep/trekkraft
-    UpdateTractionPercentage();
-
-    // Gradvis juster fartsvektoren mot bilens retning
-    // if(!isDrifting)
-    {
-        AdjustVelocityTowardsAngle(); // 0.05 = LERP factor. Lower => smoother transition
-    }
-
-    // Oppdater posisjon basert på den nåværende hastigheten
-    UpdatePosition();
-
-    // Påfør friksjon hvis bilen ikke akselererer
-    if(!isAccelerating)
-    {
-        ApplyFriction();
-    }
-
-    // Begrens hastigheten til topSpeed
-    RestrictSpeedToTopSpeed();
-}
-
 void Car::AdjustVelocityTowardsAngle()
 {
-    float lerpFactor = 0.01f;
+    float lerpFactor = tractionPercentage;
 
     float targetVelocityX = cos(angle) * velocity.getSize();
     float targetVelocityY = sin(angle) * velocity.getSize();
@@ -188,14 +172,10 @@ void Car::AdjustVelocityTowardsAngle()
 }
 
 void Car::UpdatePosition()
-{
-    // Bevegelse i fartsretningen (reduksjon av trekkraft)
-    posX += velocity.x * (1 - tractionPercentage);
-    posY += velocity.y * (1 - tractionPercentage);
 
-    // Bevegelse i bilens retning (økt trekkraft)
-    posX += velocity.getSize() * cos(angle) * tractionPercentage;
-    posY += velocity.getSize() * sin(angle) * tractionPercentage;
+{
+    posX += velocity.x;
+    posY += velocity.y;
 }
 
 void Car::ApplyFriction()

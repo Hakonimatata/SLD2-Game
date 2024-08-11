@@ -18,9 +18,10 @@ public:
     void SetPosition(float x, float y);
     void SetSpeed(float speed);
 
+private:
+
     void Accelerate();
     void Reverse();
-    void Slide();
     void AdjustVelocityTowardsAngle();
     void UpdatePosition();
     void ApplyFriction();
@@ -30,26 +31,24 @@ public:
 
     float GetTopSpeedPercentage();
     float GetAngleSpeed();
+    void UpdateTractionPercentage();
 
-private:
-    // Physical properties
+    // Physical properties adjustable by user
     float acceleration = 0.2f;
-    const float topSpeed = 6.0f;
+    float topSpeed;
+    float rotationSpeed = 0.2f; // Fart bilen roterer. Eks 0 hvis står stille
+    float friction = 0.01f; // Hvor mye bilen automatisk bremser når man ikke akselererer
+    
+    // Physical properties not adjustable by user
     FloatPoint velocity = {0.0f, 0.0f};
-    float rotationSpeed = 0.2f;
-    float friction = 0.01f;
     float angle = 0.0f;
-
     bool isAccelerating = false;
     bool isDrifting = false;
     float tractionPercentage = 1.0f; // between 0 and 1. 1 is perfect traction
-    void UpdateTractionPercentage();
-
-
     float posX, posY;     // Posisjon
-    float speed;          // Hastighet i piksler per sekund
 
 
+    // SDL properties
     int spriteWidth, spriteHeight; // Width and height of sprite
     SDL_Rect spriteRect;  // SDL_Rect for rendering
     SDL_Texture* texture;

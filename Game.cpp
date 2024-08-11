@@ -59,8 +59,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 
 
         // Initialize player
-        // player = new Player(renderer, 100.0f, 100.0f, 10.0f); // Startposisjon (100, 100) og hastighet 200 piksler/sekund
-        player = new Car(renderer, 100.0f, 100.0f, 10.0f);
+        player = new Car(renderer, 100.0f, 100.0f, 7.0f);
 
         isRunning = true;
         lastFrameTime = SDL_GetTicks();
