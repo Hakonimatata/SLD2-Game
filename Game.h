@@ -24,7 +24,7 @@ public:
 
     bool running(){ return isRunning; }
 
-    void resizeElements(int width, int height);
+    void resizeElements(int newWidth, int newHeight);
 
 private:
 
@@ -33,9 +33,11 @@ private:
     void initPlayers();
     void initPlayerControls();
 
-
+    // Original width and height
     int WinW;
     int WinH;
+
+    const float carScaleFactor = 0.5f;
 
     float getDeltaTime();
     

@@ -6,11 +6,11 @@
 
 using namespace std;
 
-Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile) 
-    : posX(x), posY(y), topSpeed(speed)
+
+Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor) 
+    : posX(x), posY(y)
 {
-    spriteWidth = 25;
-    spriteHeight = 60;
+    topSpeed = speed;
     
     spriteRect.w = spriteWidth;
     spriteRect.h = spriteHeight;
@@ -28,6 +28,8 @@ Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::strin
     if(texture == NULL) {
         cout << "Failed to load texture: " << SDL_GetError() << endl;
     }
+
+    ScaleEverything(scaleFactor);
 }
 
 
@@ -94,7 +96,7 @@ void Car::Update(float deltaTime)
 
     if(isBoosting)
     {
-        ApplyBoost(deltaTime);
+        ApplyBoost(deltaTime); // Deltatime used for duration
     }
 
 
@@ -134,6 +136,21 @@ void Car::StartBoost(float multiplier, float duration)
         normalTopSpeed = topSpeed;
         topSpeed *= boostMultiplier;  // Øk toppfarten midlertidig
     }
+}
+
+void Car::ScaleEverything(float scaleFactor)
+{
+    // Todo: check if errors occur
+    topSpeed *= scaleFactor;
+    spriteWidth *= scaleFactor;
+    spriteHeight *= scaleFactor;
+    spriteRect.w = spriteWidth;
+    spriteRect.h = spriteHeight;
+    acceleration *= scaleFactor;
+    friction *= scaleFactor;
+
+    posX *= scaleFactor;
+    posY *= scaleFactor;
 }
 
 void Car::Accelerate()

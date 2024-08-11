@@ -10,7 +10,7 @@
 
 class Car {
 public:
-    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile);
+    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor);
     ~Car();
 
     void HandleInput(const Uint8* state, const PlayerControls& controls);
@@ -22,6 +22,8 @@ public:
 
     // Boost functionality
     void StartBoost(float multiplier, float duration);
+
+    void ScaleEverything(float scaleFactor);
 
 private:
     void Accelerate();
@@ -53,7 +55,8 @@ private:
     float posX, posY;  // Posisjon
 
     // SDL properties
-    int spriteWidth, spriteHeight;   // Width and height of sprite
+    int spriteWidth = 40; 
+    int spriteHeight = 90;   // Width and height of sprite
     SDL_Rect spriteRect;             // SDL_Rect for rendering
     SDL_Texture* texture;
 

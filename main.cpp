@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int WIDTH = 800, HEIGHT = 600;
+const int WIDTH = 800, HEIGHT = 500;
 
 
 int main(int argc, char* argv[])
@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     // Create instance of Game
     Game* game = new Game();
     
-    // Initialize SDL
+    // Initialize Game
     game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false, true);
 
     while (game->running())

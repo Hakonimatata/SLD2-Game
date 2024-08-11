@@ -6,13 +6,7 @@ using namespace std;
 
 Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), lastFrameTime(0) 
 {
-
-    backgroundSpriteRect.h = 600;
-    backgroundSpriteRect.w = 800;
-    backgroundSpriteRect.x = 0;
-    backgroundSpriteRect.y = 0;
-
-    
+       
 }
 
 Game::~Game()
@@ -22,6 +16,16 @@ Game::~Game()
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen, bool twoPlayerMode)
 {
+    WinW = width;
+    WinH = height;
+
+    backgroundSpriteRect.h = height;
+    backgroundSpriteRect.w = width;
+    backgroundSpriteRect.x = 0;
+    backgroundSpriteRect.y = 0;
+
+
+
     this->twoPlayerMode = twoPlayerMode;
 
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
@@ -98,11 +102,11 @@ bool Game::loadBackgroundTexture(const std::string& filepath)
 
 void Game::initPlayers()
 {
-    players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png");
+    players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png", carScaleFactor);
 
     if (twoPlayerMode)
     {
-        players[1] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar2.png");
+        players[1] = new Car(renderer, 100.0f, 200.0f, 7.0f, "assets/RaceCar2.png", carScaleFactor);
     }
 }
 
@@ -148,10 +152,11 @@ void Game::handleEvents()
         {
             int newWidth = event.window.data1;
             int newHeight = event.window.data2;
-            WinW = newWidth;
-            WinH = newHeight;
 
             resizeElements(newWidth, newHeight);
+            
+            WinW = newWidth;
+            WinH = newHeight;
         }
         break;
     default:
@@ -207,12 +212,28 @@ void Game::clean()
     cout << "Game cleaned" << endl;
 }
 
-void Game::resizeElements(int width, int height)
+// void Game::resizeElements(int width, int height)
+// {
+//     // Resize background
+//     backgroundSpriteRect.h = height;
+//     backgroundSpriteRect.w = width;
+// }
+
+void Game::resizeElements(int newWidth, int newHeight)
 {
+    // Beregn skaleringsfaktoren basert på den nye bredden
+    float scaleFactor = static_cast<float>(newWidth) / static_cast<float>(WinW);
+
     // Resize background
-    backgroundSpriteRect.h = height;
-    backgroundSpriteRect.w = width;
+    backgroundSpriteRect.w = newWidth;
+    backgroundSpriteRect.h = static_cast<int>(WinH * scaleFactor);  // Juster høyden basert på skaleringsfaktoren
+
+    // Skaler alle spillere
+    for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
+        players[i]->ScaleEverything(scaleFactor);
+    }
 }
+
 
 // Helper function to calculate delta time
 float Game::getDeltaTime()
