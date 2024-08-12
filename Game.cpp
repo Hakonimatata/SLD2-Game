@@ -180,6 +180,14 @@ void Game::update()
     // Update player
     players[0]->Update(deltaTime);
     if(twoPlayerMode) {players[1]->Update(deltaTime);}
+
+    updateCamera();
+}
+
+// Todo: implement update camera
+void Game::updateCamera()
+{
+    // Update camera
 }
 
 

@@ -19,6 +19,7 @@ public:
     
     void handleEvents();
     void update();
+    void updateCamera();
     void render();
     void clean();
 
@@ -37,7 +38,7 @@ private:
     int WinW;
     int WinH;
 
-    const float carScaleFactor = 0.5f;
+    const float carScaleFactor = 0.6f;
 
     float getDeltaTime();
     

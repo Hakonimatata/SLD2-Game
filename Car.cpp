@@ -48,7 +48,7 @@ void Car::HandleInput(const Uint8* state, const PlayerControls& controls)
 
     // Boost
     if (state[controls.boost]) {
-        StartBoost(1.5f, 0.5f);
+        StartBoost(1.5f, 30.0f);
     }
 
     // Turn left
@@ -133,7 +133,7 @@ void Car::StartBoost(float multiplier, float duration)
     {
         isBoosting = true;
         boostMultiplier = multiplier;
-        boostDuration = duration;
+        boostDuration = duration * deltaTime;
         boostElapsedTime = 0.0f;
         normalTopSpeed = topSpeed;
         topSpeed *= boostMultiplier;  // Øk toppfarten midlertidig

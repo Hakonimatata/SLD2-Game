@@ -24,7 +24,7 @@ public:
     void StartBoost(float multiplier, float duration);
     void ApplyBoost();
 
-    void ScaleEverything(float scaleFactor); // Scales sprites, top speed, acceleration, friction, etc.
+    void ScaleEverything(float scaleFactor); // Scales sprites, top speed, acceleration, friction, etc. Use when resizing the window or zooming in/out
 
 private:
     void Accelerate();
@@ -42,19 +42,19 @@ private:
     float GetAngleSpeed();
 
     // Physical properties adjustable by user
-    float physicsSpeedFactor = 75.0f; // Multiplier for delta time => speed of all physics
+    float physicsSpeedFactor = 75.0f;       // Multiplier for delta time => speed of all physics
     float acceleration = 0.2f; 
     float topSpeed;
-    float rotationSpeed = 0.2f;  // Fart bilen roterer. Eks 0 hvis står stille
-    float friction = 0.01f;      // Hvor mye bilen automatisk bremser når man ikke akselererer
+    float rotationSpeed = 0.2f;             // Fart bilen roterer. Eks 0 hvis står stille
+    float friction = 0.01f;                 // Hvor mye bilen automatisk bremser når man ikke akselererer
 
     // Physical properties not adjustable by user
     FloatPoint velocity = {0.0f, 0.0f};
     float angle = 0.0f;
     bool isAccelerating = false;
     bool isDrifting = false;
-    float tractionPercentage = 1.0f;  // between 0 and 1. 1 is perfect traction
-    float posX, posY;  // Posisjon
+    float tractionPercentage = 1.0f;         // between 0 and 1. 1 is perfect traction
+    float posX, posY;                        // Posisjon
     float deltaTime;
 
     // SDL properties
