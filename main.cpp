@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "Game.h"
 #include "SDL_image.h"
+#include "LevelEditor.hpp"
 
 using namespace std;
 
@@ -10,6 +11,22 @@ const int WIDTH = 800, HEIGHT = 500;
 
 int main(int argc, char* argv[])
 {
+    // Todo: Add launcher for editor/game
+
+    LevelEditor* levelEditor = new LevelEditor();
+
+    levelEditor->init("Level Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false);
+
+    while(levelEditor->running())
+    {
+        levelEditor->handleEvents();
+        levelEditor->update();
+        levelEditor->render();
+    }
+
+    levelEditor->clean();
+
+
     // Create instance of Game
     Game* game = new Game();
     
@@ -22,6 +39,8 @@ int main(int argc, char* argv[])
         game->update();
         game->render();
     }
+
+    game->clean();
 
     return EXIT_SUCCESS;
 }

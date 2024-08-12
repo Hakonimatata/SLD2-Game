@@ -1,19 +1,24 @@
-#ifndef TILESET_HPP
-#define TILESET_HPP
-
-#include <unordered_map>
+#include <map>
+#include <string>
+#include <vector>
+#include <SDL2/SDL.h>
+#include "SDL_image.h"
 #include "Tile.hpp"
 
 class TileSet {
 public:
-    // Load tile into the tileset
-    void AddTile(int id, SDL_Texture* texture, const std::vector<Hitbox>& hitboxes);
+    TileSet(SDL_Renderer* renderer);
+    ~TileSet();
 
-    // Get a tile by its ID
+    // Legg til en tile i settet
+    void AddTile(int id, const std::string& imagePath, const std::vector<Hitbox>& hitboxes);
+    
+    // Hent en tile basert på ID
     Tile* GetTile(int id) const;
 
 private:
-    std::unordered_map<int, Tile*> tiles; // Mapping from ID to Tile
+    SDL_Renderer* renderer;
+    std::map<int, Tile*> tiles;
 };
 
-#endif // TILESET_HPP
+
