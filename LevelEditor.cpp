@@ -9,7 +9,6 @@ LevelEditor::LevelEditor()
 {
     gridWidth = 10;
     gridHeight = 10;
-    tileSize = 64;
 
     // Initialize grid with empty tiles (e.g., ID 0 represents no tile)
     grid.resize(gridHeight, std::vector<int>(gridWidth, 0));
@@ -43,6 +42,18 @@ void LevelEditor::handleEvents()
             WinH = newHeight;
         }
         break;
+    
+    case SDL_MOUSEBUTTONDOWN:
+        
+        if (event.button.button == SDL_BUTTON_LEFT){
+            // Todo: Add left mouse button logic here
+
+            HandleMouseClick(event.button.x, event.button.y);
+
+
+        }
+
+        break;
     default:
         break;
     }
@@ -62,7 +73,7 @@ void LevelEditor::render()
     SDL_RenderClear(renderer);
 
     // Add to renderer here
-    
+    DrawBackgroundGrid(renderer);
 
     // Draw map and tiles
     DrawMap(renderer);
@@ -108,6 +119,13 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
 {
     WinW = width;
     WinH = height;
+
+    // Set tile size based on window size
+    gridShiftX = WinW * 0.1;
+    gridShiftY = WinH * 0.1;
+    // Fit a 10x10 grid in window
+    tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
+
 
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {
@@ -190,8 +208,49 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
             Tile* tile = tileSet->GetTile(tileID);
             if (tile != nullptr) {
                 tile->SetGridPosition(x, y);
-                tile->Render(renderer, tileSize);
+                tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
             }
         }
     }
+}
+
+void LevelEditor::DrawBackgroundGrid(SDL_Renderer *renderer) const
+{
+    // Setter fargen for linjen (RGB: 255, 0, 0, full opasitet)
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
+
+    for(int i = 0; i <= gridWidth; ++i){
+        SDL_RenderDrawLine(renderer, gridShiftX + i * tileSize, gridShiftY, gridShiftX + i * tileSize, gridShiftY + gridHeight * tileSize);
+    }
+    for(int i = 0; i <= gridHeight; ++i){
+        SDL_RenderDrawLine(renderer, gridShiftX, gridShiftY + i * tileSize, gridShiftX + gridWidth * tileSize, gridShiftY + i * tileSize);
+    }
+}
+
+Point LevelEditor::GetTopLeftPointFromGridCoords(int x, int y) const
+{
+    int GridXPos = gridShiftX + x * tileSize;
+    int GridYPos = gridShiftY + y * tileSize;
+
+    return Point{GridXPos, GridYPos};
+}
+
+void LevelEditor::HandleMouseClick(int x, int y)
+{
+    // start med å plassere tile
+
+    // sjekk om innenfor grid
+    if(x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize){
+        // Inside grid
+        // Find which tile is clicked
+        int tileX = (x - gridShiftX) / tileSize;
+        int tileY = (y - gridShiftY) / tileSize;
+
+        PlaceTile(tileX, tileY, 1);
+        
+    }
+
 }

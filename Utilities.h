@@ -8,6 +8,11 @@ struct FloatPoint{
     float getSize();
 };
 
+struct Point{
+    int x;
+    int y;
+};
+
 struct PlayerControls {
     SDL_Scancode accelerate;
     SDL_Scancode reverse;

@@ -1,13 +1,6 @@
 #include "Utilities.h"
 #include <math.h>
 
-struct Point 
-{
-    int x = 0;
-    int y = 0;
-};	
-
-
 void FloatPoint::normalize()
 {
     double magnitude = getSize();

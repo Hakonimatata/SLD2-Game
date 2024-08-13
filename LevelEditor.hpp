@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "TileSet.hpp"
+#include "Utilities.h"
 #include "SDL2/SDL.h"
 #include "SDL_image.h"
 
@@ -29,6 +30,9 @@ public:
     void LoadLevel(const string& filename);
 
     void DrawMap(SDL_Renderer* renderer) const;
+    void DrawBackgroundGrid(SDL_Renderer* renderer) const;
+    Point GetTopLeftPointFromGridCoords(int x, int y) const;
+    void HandleMouseClick(int x, int y);
     bool running() { return isRunning; }
 private:
     int currentTileID = 0; // 0 is nothing
@@ -39,6 +43,7 @@ private:
 
     int WinW, WinH;
     int gridWidth, gridHeight;
+    int gridShiftX, gridShiftY;
     int tileSize;
     vector<vector<int>> grid; // Grid storing tile IDs
     TileSet* tileSet; // Reference to the TileSet

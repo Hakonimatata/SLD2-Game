@@ -12,7 +12,7 @@ public:
     Tile(int id, SDL_Texture* texture, const std::vector<Hitbox>& hitboxes, int gridX, int gridY);
 
     // Rendering the tile
-    void Render(SDL_Renderer* renderer, int tileSize);
+    void Render(SDL_Renderer* renderer, int tileSize, int gridShiftX, int gridShiftY);
 
     // Getters
     int GetID() const { return id; }
