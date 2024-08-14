@@ -2,7 +2,12 @@
 #include <iostream>
 #
 
-TileSet::TileSet(SDL_Renderer* renderer) : renderer(renderer) {}
+TileSet::TileSet(SDL_Renderer* renderer) : renderer(renderer) 
+{
+    // Load tiles
+    AddTile(1, "assets/TestTile.png", /* hitboxes. Tomt nå */ {});
+    AddTile(2, "assets/TestTile2.png", /* hitboxes. Tomt nå */ {});
+}
 
 TileSet::~TileSet() {
     for (auto& pair : tiles) {

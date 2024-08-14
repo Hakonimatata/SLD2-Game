@@ -12,7 +12,7 @@ using namespace std;
 
 class LevelEditor {
 public:
-    LevelEditor();
+    LevelEditor(int gridWidth, int gridHeight);
     ~LevelEditor();
 
     void handleEvents();
@@ -26,16 +26,24 @@ public:
 
 
     void PlaceTile(int x, int y, int tileID);
+    void RotateTile(int x, int y);
     void SaveLevel(const string& filename) const;
     void LoadLevel(const string& filename);
 
     void DrawMap(SDL_Renderer* renderer) const;
     void DrawBackgroundGrid(SDL_Renderer* renderer) const;
     Point GetTopLeftPointFromGridCoords(int x, int y) const;
-    void HandleMouseClick(int x, int y);
+    void HandleRightMouseClick(int x, int y);
     bool running() { return isRunning; }
+
+    void DrawAvailableTiles(SDL_Renderer* renderer) const;
+    SDL_Rect GetAvailableTileRect(int tileIndex) const;
+
+    bool isInsideGrid(int x, int y) const;
+
 private:
-    int currentTileID = 0; // 0 is nothing
+
+    int selectedTileID = 0; // 0 is nothing
 
     bool isRunning;
     SDL_Window* window;
@@ -45,7 +53,7 @@ private:
     int gridWidth, gridHeight;
     int gridShiftX, gridShiftY;
     int tileSize;
-    vector<vector<int>> grid; // Grid storing tile IDs
+    vector<vector<TileData>> grid; // Grid storing tile IDs
     TileSet* tileSet; // Reference to the TileSet
     Uint32 lastFrameTime;
 };
