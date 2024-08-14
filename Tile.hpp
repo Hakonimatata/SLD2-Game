@@ -1,6 +1,8 @@
 #ifndef TILE_HPP
 #define TILE_HPP
 
+#pragma once
+
 #include <SDL.h>
 #include <vector>
 #include <string>

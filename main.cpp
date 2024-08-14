@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 {
     // Todo: Add launcher for editor/game
 
-    LevelEditor* levelEditor = new LevelEditor(5, 5);
+    LevelEditor* levelEditor = new LevelEditor(10, 10);
 
     levelEditor->init("Level Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false);
 

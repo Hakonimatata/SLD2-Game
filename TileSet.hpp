@@ -1,3 +1,7 @@
+#ifndef TILESET_HPP
+#define TILESET_HPP
+
+
 #include <map>
 #include <string>
 #include <vector>
@@ -23,3 +27,4 @@ private:
 };
 
 
+#endif // TILESET_HPP

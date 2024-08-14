@@ -63,6 +63,12 @@ void LevelEditor::handleEvents()
 
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
+
+
+    // Temp save to file
+    if (state[SDL_SCANCODE_S]) {
+        SaveLevel("level.txt");
+    }
 }
 
 void LevelEditor::update()
@@ -76,7 +82,7 @@ void LevelEditor::render()
     SDL_RenderClear(renderer);
 
     // Add to renderer here
-    DrawBackgroundGrid(renderer);
+    DrawGrid(renderer);
 
     // Draw map and tiles
     DrawMap(renderer);
@@ -252,7 +258,7 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
 }
 
 
-void LevelEditor::DrawBackgroundGrid(SDL_Renderer *renderer) const
+void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
 {
     // Setter fargen for linjen (RGB: 255, 0, 0, full opasitet)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);

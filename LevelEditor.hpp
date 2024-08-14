@@ -1,6 +1,8 @@
 #ifndef LEVELEDITOR_HPP
 #define LEVELEDITOR_HPP
 
+#pragma once
+
 #include <vector>
 #include <string>
 #include "TileSet.hpp"
@@ -31,7 +33,7 @@ public:
     void LoadLevel(const string& filename);
 
     void DrawMap(SDL_Renderer* renderer) const;
-    void DrawBackgroundGrid(SDL_Renderer* renderer) const;
+    void DrawGrid(SDL_Renderer* renderer) const;
     Point GetTopLeftPointFromGridCoords(int x, int y) const;
     void HandleRightMouseClick(int x, int y);
     bool running() { return isRunning; }

@@ -1,9 +1,12 @@
+#pragma once
+
 #include "SDL2/SDL.h"
 #include <stdio.h>
 #include "SDL_image.h"
 #include "Player.hpp"
 #include "Car.hpp"
 #include <string>
+#include "TileSet.hpp"
 
 
 using namespace std;
@@ -26,6 +29,7 @@ public:
     bool running(){ return isRunning; }
 
     void resizeElements(int newWidth, int newHeight);
+    void loadLevel(const std::string& filename);
 
 private:
 
@@ -33,12 +37,23 @@ private:
     bool loadBackgroundTexture(const std::string& filepath);
     void initPlayers();
     void initPlayerControls();
+    void DrawMap(SDL_Renderer* renderer) const;
 
     // Original width and height
-    int WinW;
-    int WinH;
+    int WinW, WinH;
 
-    const float carScaleFactor = 0.6f;
+    // Grid
+    int gridWidth, gridHeight;
+    float gridShiftX, gridShiftY;
+    vector<vector<TileData>> grid; // Grid storing tile IDs
+
+
+    TileSet* tileSet;
+    float tileSize;
+
+
+
+    const float carScaleFactor = 0.4f;
 
     float getDeltaTime();
     
