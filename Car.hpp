@@ -26,6 +26,8 @@ public:
 
     void ScaleEverything(float scaleFactor); // Scales sprites, top speed, acceleration, friction, etc. Use when resizing the window or zooming in/out
 
+    FloatPoint GetPos() const { return {posX, posY}; }
+
 private:
     void Accelerate();
     void Reverse();

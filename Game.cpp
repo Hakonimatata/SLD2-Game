@@ -212,13 +212,32 @@ void Game::update()
     updateCamera();
 }
 
-// Todo: implement update camera
 void Game::updateCamera()
 {
-    // Update camera
+    // Window mid-points
+    float centerX = WinW;
+    float centerY = WinH;
+
+    // Get the car's current position
+    FloatPoint carPos = players[0]->GetPos();
+
+    // Desired grid shift to keep the car centered on the screen
+    float targetShiftX = centerX - carPos.x;
+    float targetShiftY = centerY - carPos.y;
+
+    // Lerp factor (controls the smoothness of the camera movement)
+    float lerpFactor = 0.01f; // Adjust this value to control the speed of the camera adjustment
+
+    // Smoothly adjust the car towards the target shift
+    carPos.x += (targetShiftX - carPos.x) * lerpFactor;
+    carPos.y += (targetShiftY - carPos.y) * lerpFactor;
+
+    gridShiftX += (targetShiftX - carPos.x) * lerpFactor;
+    gridShiftY += (targetShiftY - carPos.y) * lerpFactor;
+
+    // The player's position remains unchanged
+    players[0]->SetPosition(carPos.x, carPos.y);
 }
-
-
 
 void Game::render()
 {
