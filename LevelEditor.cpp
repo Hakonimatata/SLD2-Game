@@ -47,7 +47,7 @@ void LevelEditor::handleEvents()
         
         if (event.button.button == SDL_BUTTON_LEFT){
 
-            HandleRightMouseClick(event.button.x, event.button.y);
+            HandleLefttMouseClick(event.button.x, event.button.y);
 
         }
         if (event.button.button == SDL_BUTTON_RIGHT){
@@ -282,7 +282,7 @@ Point LevelEditor::GetTopLeftPointFromGridCoords(int x, int y) const
     return Point{GridXPos, GridYPos};
 }
 
-void LevelEditor::HandleRightMouseClick(int x, int y)
+void LevelEditor::HandleLefttMouseClick(int x, int y)
 {
     // sjekk om innenfor grid
     if(isInsideGrid(x, y)){
@@ -316,8 +316,6 @@ void LevelEditor::HandleRightMouseClick(int x, int y)
             i++; // Gå til neste tile
         }
     }
-
-    
 }
 
 void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const

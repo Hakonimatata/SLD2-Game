@@ -279,8 +279,8 @@ void Game::loadLevel(const std::string &filename)
     ifs >> gridWidth >> gridHeight;
 
     // Recalculate the tile size based on the loaded grid dimensions
-    tileSize = min((WinH - 2* gridShiftY) / gridHeight, (WinW - 2* gridShiftX) / gridWidth);
-    tileSize*= 3; // temporary
+    tileSize = min((WinH - 2* gridShiftY) / gridHeight, (WinW - 2* gridShiftX) / gridWidth); // This defiens level size atm
+    tileSize*= 2; // temporary 
 
     // Set grid size accordingly
     grid.resize(gridHeight, std::vector<TileData>(gridWidth));

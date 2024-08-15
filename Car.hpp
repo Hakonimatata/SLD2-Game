@@ -10,7 +10,7 @@
 
 class Car {
 public:
-    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor);
+    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor, float physicsSpeedFactor = 75.0f);
     ~Car();
 
     void HandleInput(const Uint8* state, const PlayerControls& controls);
@@ -42,7 +42,7 @@ private:
     float GetAngleSpeed();
 
     // Physical properties adjustable by user
-    float physicsSpeedFactor = 75.0f;       // Multiplier for delta time => speed of all physics
+    float physicsSpeedFactor;       // Multiplier for delta time => speed of all physics
     float acceleration = 0.2f; 
     float topSpeed;
     float rotationSpeed = 0.2f;             // Fart bilen roterer. Eks 0 hvis står stille

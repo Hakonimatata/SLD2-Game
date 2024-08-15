@@ -35,7 +35,7 @@ public:
     void DrawMap(SDL_Renderer* renderer) const;
     void DrawGrid(SDL_Renderer* renderer) const;
     Point GetTopLeftPointFromGridCoords(int x, int y) const;
-    void HandleRightMouseClick(int x, int y);
+    void HandleLefttMouseClick(int x, int y);
     bool running() { return isRunning; }
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
