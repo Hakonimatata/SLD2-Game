@@ -230,28 +230,52 @@ void Game::update()
 void Game::updateCamera()
 {
     // Window mid-points
-    float centerX = WinW;
-    float centerY = WinH;
-
+    float centerX = WinW * 0.5; // Todo: find out why this is not WinW / 2
+    float centerY = WinH * 0.5;
+    
     // Get the car's current position
     FloatPoint carPos = players[0]->GetPos();
+    float distance = 0.0f;
+    FloatPoint midPoint = {0.0f, 0.0f};
 
-    // Desired grid shift to keep the car centered on the screen
-    float targetShiftX = centerX - carPos.x;
-    float targetShiftY = centerY - carPos.y;
+    float targetShiftX, targetShiftY;
+
+    if(twoPlayerMode) // Keep camera in between cars
+    {
+        FloatPoint car2Pos = players[1]->GetPos();
+        distance = getDistanceBetween(carPos, car2Pos);
+        midPoint = getMidPointBetween(carPos, car2Pos);
+
+        targetShiftX = centerX - midPoint.x;
+        targetShiftY = centerY - midPoint.y;
+    }
+    else // Desired grid shift to keep the car centered on the screen
+    {
+        targetShiftX = centerX - carPos.x;
+        targetShiftY = centerY - carPos.y;
+    }
 
     // Lerp factor (controls the smoothness of the camera movement)
-    float lerpFactor = 0.01f; // Adjust this value to control the speed of the camera adjustment
+    float lerpFactor = 0.02f; // Adjust this value to control the speed of the camera adjustment
+
+    // Add the same amount of movement to the map, as applied to the car under
+    gridShiftX += (targetShiftX) * lerpFactor;
+    gridShiftY += (targetShiftY) * lerpFactor;
 
     // Smoothly adjust the car towards the target shift
-    carPos.x += (targetShiftX - carPos.x) * lerpFactor;
-    carPos.y += (targetShiftY - carPos.y) * lerpFactor;
-
-    gridShiftX += (targetShiftX - carPos.x) * lerpFactor;
-    gridShiftY += (targetShiftY - carPos.y) * lerpFactor;
-
-    // The player's position remains unchanged
+    carPos.x += (targetShiftX) * lerpFactor;
+    carPos.y += (targetShiftY) * lerpFactor;
     players[0]->SetPosition(carPos.x, carPos.y);
+
+    if(twoPlayerMode) // Update car 2 as well
+    {
+        FloatPoint car2Pos = players[1]->GetPos();
+        car2Pos.x += (targetShiftX) * lerpFactor;
+        car2Pos.y += (targetShiftY) * lerpFactor;
+        players[1]->SetPosition(car2Pos.x, car2Pos.y);
+    }
+
+    // Keep in screen! // Todo: implement
 }
 
 void Game::render()

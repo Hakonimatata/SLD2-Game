@@ -8,6 +8,10 @@ struct FloatPoint{
     float getSize();
 };
 
+float getDistanceBetween(FloatPoint a, FloatPoint b);
+
+FloatPoint getMidPointBetween(FloatPoint a, FloatPoint b);
+
 struct Point{
     int x;
     int y;
