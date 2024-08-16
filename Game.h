@@ -42,28 +42,22 @@ class Game
         void DrawMap(SDL_Renderer* renderer) const;
         float getDeltaTime();
 
-        // Original width and height
-        int WinW, WinH;
-
-        // Map Grid
-        int gridWidth, gridHeight;
+       
+        int WinW, WinH;                   // Original width and height
+        int gridWidth, gridHeight;        // Map grid size
         float gridShiftX, gridShiftY;
-        vector<vector<TileData>> grid; // Grid storing tile IDs
-
-        // Tile data
-        TileSet* tileSet;
-
+        vector<vector<TileData>> grid;    // Grid storing tile IDs
+        TileSet* tileSet;                 // Tile data
+        bool isRunning;                   // Is game running
+        SDL_Window* window;               // SDL window
+        SDL_Renderer* renderer;           // SDL renderer
+        PlayerControls playerControls[2]; // Player controlls
+        Car* players[2];                  // Players
+        bool twoPlayerMode;               // Two player mode
+        Uint32 lastFrameTime;             // Last frame time
         
-        bool isRunning;
-        SDL_Window* window;
-        SDL_Renderer* renderer;
-        PlayerControls playerControls[2];
-        Car* players[2];
-        bool twoPlayerMode;
-        Uint32 lastFrameTime;
-
-        SDL_Rect backgroundSpriteRect; 
-        SDL_Texture* backgroundTexture;
+        SDL_Rect backgroundSpriteRect;    // For background if needed
+        SDL_Texture* backgroundTexture;   // Background texture
         
 };
 

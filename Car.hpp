@@ -44,27 +44,27 @@ private:
     float GetAngleSpeed();
 
     // Physical parameters adjustable by user
-    float physicsSpeedFactor;       // Multiplier for delta time => speed of all physics
-    float acceleration = 0.2f; 
-    float topSpeed;
-    float rotationSpeed = 0.15f;                // Fart bilen roterer. Eks 0 hvis står stille
-    float rotationMultiplierWhenDrift = 2.0f;   // Faktor for hvor mye raskere bilen roterer under drift
-    float friction = 0.01f;                     // Hvor mye bilen automatisk bremser når man ikke akselererer
+    float physicsSpeedFactor;       // Multiplier for delta time => speed of all physics (set in constructor)
+    float acceleration = 0.2f;      // Car gas acceleration
+    float topSpeed;                 // Top speed of the car (set in constructor)
+    float rotationSpeed = 0.15f;                // Rotation speed of the car 
+    float rotationMultiplierWhenDrift = 2.0f;   // Multiplier for rotation speed when drifting
+    float friction = 0.01f;                     // Speed reduction when not accelerating
 
     // Physical properties not adjustable by user
     FloatPoint velocity = {0.0f, 0.0f};
-    float angle = 0.0f;
-    bool isAccelerating = false;
-    bool isDrifting = false;
+    float angle = 0.0f;                      // Current nose angle of car [radians]
+    bool isAccelerating = false;             // Used to apply friction only when not accelerating
+    bool isDrifting = false;                 // Used to vary traction percentage when drift key is pressed
     float tractionPercentage = 1.0f;         // between 0 and 1. 1 is perfect traction
     float posX, posY;                        // Posisjon
-    float deltaTime;
+    float deltaTime;                         // current delta time from update() used to set speed
 
     // SDL properties
-    float spriteWidth = 40; 
-    float spriteHeight = 90;   // Width and height of sprite
-    SDL_Rect spriteRect;     // SDL_Rect for rendering
-    SDL_Texture* texture;
+    float spriteWidth = 40;    // Width of sprite
+    float spriteHeight = 90;   // Height of sprite
+    SDL_Rect spriteRect;       // SDL_Rect for rendering
+    SDL_Texture* texture;      // Car texture
 
     // Boost functionality
     bool isBoosting = false;  // Indikerer om bilen er i en boost-fase
