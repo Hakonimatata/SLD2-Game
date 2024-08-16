@@ -45,7 +45,7 @@ public:
 
 private:
 
-    int selectedTileID = 0; // 0 is nothing
+    int selectedTileID = 0; // 0 = nothing selected
 
     bool isRunning;
     SDL_Window* window;

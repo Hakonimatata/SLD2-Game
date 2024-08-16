@@ -6,7 +6,14 @@
 
 using namespace std;
 
-
+/// @brief Car constructor
+/// @param renderer 
+/// @param x x position
+/// @param y y position
+/// @param speed top speed of car
+/// @param textureFile image path
+/// @param scaleFactor scales everything proportionaly
+/// @param physicsSpeedFactor speed of how fast physics acts (acceleration, turn speed, top speed etc)
 Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor, float physicsSpeedFactor) 
     : posX(x), posY(y), physicsSpeedFactor(physicsSpeedFactor)
 {
@@ -181,8 +188,8 @@ void Car::Reverse()
     */
 
    // Apply friction for  breaking
-    velocity.x -= velocity.x * friction * 10 * deltaTime;
-    velocity.y -= velocity.y * friction * 10 * deltaTime;
+    velocity.x -= velocity.x * friction * 4 * deltaTime;
+    velocity.y -= velocity.y * friction * 4 * deltaTime;
 
 
 }
@@ -309,7 +316,7 @@ float Car::GetAngleSpeed()
     
     if(isDrifting)
     {
-        adjustedRotationSpeed *= 1.5f; // Apply factor for extra rotation when drifting
+        adjustedRotationSpeed *= rotationMultiplierWhenDrift; // Apply factor for extra rotation when drifting
     }
 
     return adjustedRotationSpeed * GetTopSpeedPercentage();

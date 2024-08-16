@@ -43,12 +43,13 @@ private:
     float GetTopSpeedPercentage();
     float GetAngleSpeed();
 
-    // Physical properties adjustable by user
+    // Physical parameters adjustable by user
     float physicsSpeedFactor;       // Multiplier for delta time => speed of all physics
     float acceleration = 0.2f; 
     float topSpeed;
-    float rotationSpeed = 0.2f;             // Fart bilen roterer. Eks 0 hvis står stille
-    float friction = 0.01f;                 // Hvor mye bilen automatisk bremser når man ikke akselererer
+    float rotationSpeed = 0.15f;                // Fart bilen roterer. Eks 0 hvis står stille
+    float rotationMultiplierWhenDrift = 2.0f;   // Faktor for hvor mye raskere bilen roterer under drift
+    float friction = 0.01f;                     // Hvor mye bilen automatisk bremser når man ikke akselererer
 
     // Physical properties not adjustable by user
     FloatPoint velocity = {0.0f, 0.0f};
@@ -60,9 +61,9 @@ private:
     float deltaTime;
 
     // SDL properties
-    int spriteWidth = 40; 
-    int spriteHeight = 90;   // Width and height of sprite
-    SDL_Rect spriteRect;             // SDL_Rect for rendering
+    float spriteWidth = 40; 
+    float spriteHeight = 90;   // Width and height of sprite
+    SDL_Rect spriteRect;     // SDL_Rect for rendering
     SDL_Texture* texture;
 
     // Boost functionality

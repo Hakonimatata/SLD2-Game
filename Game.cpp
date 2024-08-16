@@ -18,11 +18,18 @@ Game::~Game()
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen, bool twoPlayerMode)
 {
+    // Set current window size
     WinW = width;
     WinH = height;
 
-    gridShiftX = 0;
+    // Set 1 or 2 plyer mode
+    this->twoPlayerMode = twoPlayerMode;
+    
+    // Todo: Set these based on start position?
+    gridShiftX = 0; 
     gridShiftY = 0;
+
+    // Todo: Set a clean background picture
 
     // backgroundSpriteRect.h = height;
     // backgroundSpriteRect.w = width;
@@ -33,26 +40,29 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     //     isRunning = false;
     //     return;
     // }
-
-    this->twoPlayerMode = twoPlayerMode;
-
+    
+    // Initialize SDL
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {
         isRunning = false;
         return;
     }
-
+    // Initialize the players
     initPlayers();
+
+    // Set player controlls
     initPlayerControls();
 
-    isRunning = true;
-    lastFrameTime = SDL_GetTicks();
-
-    // initialize the set of tiles
+    // Get the tileset with textures for the tiles
     tileSet = new TileSet(renderer);
 
     // Load the level
     loadLevel("level.txt");
+    
+
+    // Everything initialised correctly. Running.
+    isRunning = true;
+    lastFrameTime = SDL_GetTicks();
 
 }
 
@@ -111,11 +121,11 @@ bool Game::loadBackgroundTexture(const std::string& filepath)
 
 void Game::initPlayers()
 {
-    players[0] = new Car(renderer, 100.0f, 100.0f, 7.0f, "assets/RaceCar.png", carScaleFactor);
+    players[0] = new Car(renderer, 100.0f, 100.0f, 8.0f, "assets/RaceCar.png", carScaleFactor);
 
     if (twoPlayerMode)
     {
-        players[1] = new Car(renderer, 100.0f, 200.0f, 7.0f, "assets/RaceCar2.png", carScaleFactor);
+        players[1] = new Car(renderer, 100.0f, 200.0f, 8.0f, "assets/RaceCar2.png", carScaleFactor);
     }
 }
 
@@ -127,7 +137,7 @@ void Game::initPlayerControls()
         SDL_SCANCODE_DOWN,   // Reverse
         SDL_SCANCODE_LEFT,   // Turn left
         SDL_SCANCODE_RIGHT,  // Turn right
-        SDL_SCANCODE_RCTRL,  // Drift
+        SDL_SCANCODE_RSHIFT,  // Drift
         SDL_SCANCODE_PERIOD  // Boost
     };
 
@@ -178,11 +188,15 @@ void Game::handleEvents()
     case SDL_WINDOWEVENT:
         if (event.window.event == SDL_WINDOWEVENT_RESIZED)
         {
+            // Get new window size
             int newWidth = event.window.data1;
             int newHeight = event.window.data2;
 
+            // Resize elements before setting new windowsize. 
+            // This is to get relative changes from previous window size.
             resizeElements(newWidth, newHeight);
             
+            // Set new window size
             WinW = newWidth;
             WinH = newHeight;
         }
@@ -202,13 +216,14 @@ void Game::handleEvents()
 
 void Game::update()
 {
-    // Get current delta time. This is used for smooth movement
+    // Get current delta time. This is used for smooth movement, not based on frame rate
     float deltaTime = getDeltaTime();
 
-    // Update player
+    // Update players 
     players[0]->Update(deltaTime);
     if(twoPlayerMode) {players[1]->Update(deltaTime);}
 
+    // Update camera (position of cars andmap) 
     updateCamera();
 }
 
@@ -241,10 +256,10 @@ void Game::updateCamera()
 
 void Game::render()
 {
-    // Clear current render buffer
+    // Clear current render buffer first
     SDL_RenderClear(renderer);
 
-    // Add to renderer here
+    // ------------Start Adding Render Functions Here------------
     
     // Render background
     // SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundSpriteRect);
@@ -257,6 +272,7 @@ void Game::render()
     players[0]->Render(renderer);
     if(twoPlayerMode) {players[1]->Render(renderer);}
     
+    // ------------End Adding Render Functions Here------------
 
     // Render to screen
     SDL_RenderPresent(renderer);
@@ -280,6 +296,12 @@ void Game::resizeElements(int newWidth, int newHeight)
     backgroundSpriteRect.w = newWidth;
     backgroundSpriteRect.h = static_cast<int>(WinH * scaleFactor);  // Juster høyden basert på skaleringsfaktoren
 
+    // Resize map (tilesize)
+    tileSize *= scaleFactor;
+    gridShiftX *= scaleFactor;
+    gridShiftY *= scaleFactor;
+    
+
     // Skaler alle spillere
     for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
         players[i]->ScaleEverything(scaleFactor);
@@ -296,10 +318,6 @@ void Game::loadLevel(const std::string &filename)
 
     // Add data: gridWidth, gridHeight
     ifs >> gridWidth >> gridHeight;
-
-    // Recalculate the tile size based on the loaded grid dimensions
-    tileSize = min((WinH - 2* gridShiftY) / gridHeight, (WinW - 2* gridShiftX) / gridWidth); // This defiens level size atm
-    tileSize*= 2; // temporary 
 
     // Set grid size accordingly
     grid.resize(gridHeight, std::vector<TileData>(gridWidth));

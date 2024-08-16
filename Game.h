@@ -26,49 +26,44 @@ class Game
         void clean();
 
         bool running(){ return isRunning; }
-
-        void resizeElements(int newWidth, int newHeight);
         void loadLevel(const std::string& filename);
 
     private:
+        // Ajustable parameters
+        const float carScaleFactor = 0.4f;  // Currently used to set the scale of everything for the car (into the construcotr)
+        float tileSize = 64;                // Tilesize <=> map size
 
+        // Functions
+        void resizeElements(int newWidth, int newHeight);
         bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
         bool loadBackgroundTexture(const std::string& filepath);
         void initPlayers();
         void initPlayerControls();
         void DrawMap(SDL_Renderer* renderer) const;
+        float getDeltaTime();
 
         // Original width and height
         int WinW, WinH;
 
-        // Grid
+        // Map Grid
         int gridWidth, gridHeight;
         float gridShiftX, gridShiftY;
         vector<vector<TileData>> grid; // Grid storing tile IDs
 
-
+        // Tile data
         TileSet* tileSet;
-        float tileSize;
 
-
-
-        const float carScaleFactor = 0.4f;
-
-        float getDeltaTime();
         
         bool isRunning;
         SDL_Window* window;
         SDL_Renderer* renderer;
-        
         PlayerControls playerControls[2];
         Car* players[2];
         bool twoPlayerMode;
-
+        Uint32 lastFrameTime;
 
         SDL_Rect backgroundSpriteRect; 
         SDL_Texture* backgroundTexture;
         
-
-        Uint32 lastFrameTime;
 };
 
