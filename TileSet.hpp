@@ -1,3 +1,7 @@
+#ifndef TILESET_HPP
+#define TILESET_HPP
+
+
 #include <map>
 #include <string>
 #include <vector>
@@ -16,9 +20,11 @@ public:
     // Hent en tile basert på ID
     Tile* GetTile(int id) const;
 
+    std::map<int, Tile*> tiles;
+
 private:
     SDL_Renderer* renderer;
-    std::map<int, Tile*> tiles;
 };
 
 
+#endif // TILESET_HPP

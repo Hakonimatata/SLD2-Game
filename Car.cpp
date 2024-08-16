@@ -7,8 +7,8 @@
 using namespace std;
 
 
-Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor) 
-    : posX(x), posY(y)
+Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor, float physicsSpeedFactor) 
+    : posX(x), posY(y), physicsSpeedFactor(physicsSpeedFactor)
 {
     topSpeed = speed;
     
@@ -187,7 +187,7 @@ void Car::Reverse()
 
 }
 
-
+/// @brief Dynamisk endrer grepet til hjulene mellom drifting
 void Car::UpdateTractionPercentage()
 {
     const float adjustmentSpeed = 0.004f;

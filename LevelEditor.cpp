@@ -5,13 +5,13 @@
 
 using namespace std;
 
-LevelEditor::LevelEditor()
+LevelEditor::LevelEditor(int gridWidth, int gridHeight)
 {
-    gridWidth = 10;
-    gridHeight = 10;
+    this->gridWidth = gridWidth;
+    this->gridHeight = gridHeight;
 
-    // Initialize grid with empty tiles (e.g., ID 0 represents no tile)
-    grid.resize(gridHeight, std::vector<int>(gridWidth, 0));
+    // Initialize grid with empty tiles
+    grid.resize(gridHeight, std::vector<TileData>(gridWidth, TileData()));
 }
 LevelEditor::~LevelEditor()
 {
@@ -46,11 +46,14 @@ void LevelEditor::handleEvents()
     case SDL_MOUSEBUTTONDOWN:
         
         if (event.button.button == SDL_BUTTON_LEFT){
-            // Todo: Add left mouse button logic here
 
-            HandleMouseClick(event.button.x, event.button.y);
+            HandleLefttMouseClick(event.button.x, event.button.y);
 
+        }
+        if (event.button.button == SDL_BUTTON_RIGHT){
 
+            // Todo: change to HandleLeftMouseClick?
+            RotateTile(event.button.x, event.button.y);
         }
 
         break;
@@ -60,11 +63,17 @@ void LevelEditor::handleEvents()
 
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
+
+
+    // Temp save to file
+    if (state[SDL_SCANCODE_S]) {
+        SaveLevel("level.txt");
+    }
 }
 
 void LevelEditor::update()
 {
-    // Todo: Update camera
+    // Todo: Update camera?
 }
 
 void LevelEditor::render()
@@ -73,10 +82,13 @@ void LevelEditor::render()
     SDL_RenderClear(renderer);
 
     // Add to renderer here
-    DrawBackgroundGrid(renderer);
+    DrawGrid(renderer);
 
     // Draw map and tiles
     DrawMap(renderer);
+
+    // Draw available tiles
+    DrawAvailableTiles(renderer);
     
 
     // Render to screen
@@ -93,37 +105,58 @@ void LevelEditor::clean()
 
 void LevelEditor::PlaceTile(int x, int y, int tileID) {
     if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
-        grid[y][x] = tileID; // Set the tile ID at the specified grid position
+        grid[y][x] = TileData(tileID, 0); // Set the tile ID at the specified grid position with rotation 0
     }
 }
 
-void LevelEditor::SaveLevel(const string& filename) const {
-    ofstream outFile(filename);
+void LevelEditor::RotateTile(int x, int y)
+{
+    if(isInsideGrid(x, y)){
+
+        // Find which tile is clicked
+        int tileX = (x - gridShiftX) / tileSize;
+        int tileY = (y - gridShiftY) / tileSize;
+
+        // Get the tile at that position
+        TileData& tileData = grid[tileY][tileX];
+        if (tileData.id != 0) {
+            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees
+        }
+    }
+}
+
+
+void LevelEditor::SaveLevel(const std::string& filename) const {
+    std::ofstream outFile(filename);
     if (!outFile) {
-        cerr << "Failed to open file for saving: " << filename << endl;
+        std::cerr << "Failed to open file for saving: " << filename << std::endl;
         return;
     }
 
-    outFile << gridWidth << " " << gridHeight << endl;
-    for (const auto& row : grid) {
-        for (int id : row) {
-            outFile << id << " ";
+    outFile << gridWidth << " " << gridHeight << std::endl;
+    for (int y = 0; y < gridHeight; ++y) {
+        for (int x = 0; x < gridWidth; ++x) {
+            const TileData& tileData = grid[y][x];
+            outFile << tileData.id << "," << tileData.rotation << " ";
         }
-        outFile << endl;
+        outFile << std::endl;
     }
 
     outFile.close();
 }
 
+
+
 void LevelEditor::init(const char *title, int xPos, int yPos, int width, int height, bool fullscreen)
 {
+    // Set window size
     WinW = width;
     WinH = height;
 
-    // Set tile size based on window size
+    // Set  grid shift based on window size
     gridShiftX = WinW * 0.1;
     gridShiftY = WinH * 0.1;
-    // Fit a 10x10 grid in window
+    // Fit a the grid in the window
     tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
 
 
@@ -138,14 +171,8 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
     lastFrameTime = SDL_GetTicks();
 
 
-    // Midlertidig: Opprett en testtile
-    // ------------------------------------------------------------
-    
+    // Initialize the set of tiles
     tileSet = new TileSet(renderer);
-
-    tileSet->AddTile(1, "assets/TestTile.png", /* hitboxes. Tomt nå */ {});
-
-    PlaceTile(0, 0, 1);
 }
 
 bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
@@ -174,7 +201,7 @@ bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int 
         return false;
     }
 
-    // Draw a white background
+    // Set background color to white
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
     return true;
@@ -182,39 +209,56 @@ bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int 
 
 
 
-void LevelEditor::LoadLevel(const string& filename) {
-    ifstream inFile(filename);
-    if (!inFile) {
-        cerr << "Failed to open file for loading: " << filename << endl;
+void LevelEditor::LoadLevel(const std::string& filename) {
+    std::ifstream ifs(filename);
+    if (!ifs) {
+        std::cerr << "Failed to open file for loading: " << filename << std::endl;
         return;
     }
 
-    inFile >> gridWidth >> gridHeight;
-    grid.resize(gridHeight, vector<int>(gridWidth, 0));
+    // Add data: gridWidth, gridHeight
+    ifs >> gridWidth >> gridHeight;
 
-    for (auto& row : grid) {
-        for (int& id : row) {
-            inFile >> id;
+    // Set grid size accordingly
+    grid.resize(gridHeight, std::vector<TileData>(gridWidth));
+
+    for (int y = 0; y < gridHeight; ++y) {
+        for (int x = 0; x < gridWidth; ++x) {
+            std::string idRotationPair;
+            ifs >> idRotationPair;
+
+            size_t commaPos = idRotationPair.find(',');
+            int id = std::stoi(idRotationPair.substr(0, commaPos));
+            int rotation = std::stoi(idRotationPair.substr(commaPos + 1));
+
+            grid[y][x] = TileData(id, rotation);
         }
     }
 
-    inFile.close();
+    ifs.close();
 }
 
+
 void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
+    // Check each grid position for tile and draw
     for (int y = 0; y < gridHeight; ++y) {
         for (int x = 0; x < gridWidth; ++x) {
-            int tileID = grid[y][x];
-            Tile* tile = tileSet->GetTile(tileID);
-            if (tile != nullptr) {
-                tile->SetGridPosition(x, y);
-                tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+            // Get tile data from grid point
+            const TileData& tileData = grid[y][x];
+            if (tileData.id != 0) {
+                Tile* tile = tileSet->GetTile(tileData.id);
+                if (tile != nullptr) {
+                    tile->SetGridPosition(x, y);
+                    tile->SetRotation(tileData.rotation); // Set rotation for rendering
+                    tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+                }
             }
         }
     }
 }
 
-void LevelEditor::DrawBackgroundGrid(SDL_Renderer *renderer) const
+
+void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
 {
     // Setter fargen for linjen (RGB: 255, 0, 0, full opasitet)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -238,18 +282,82 @@ Point LevelEditor::GetTopLeftPointFromGridCoords(int x, int y) const
     return Point{GridXPos, GridYPos};
 }
 
-void LevelEditor::HandleMouseClick(int x, int y)
+void LevelEditor::HandleLefttMouseClick(int x, int y)
 {
-    // start med å plassere tile
-
     // sjekk om innenfor grid
-    if(x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize){
-        // Find position of the tile that is clicked
+    if(isInsideGrid(x, y)){
+        // Inside grid
+        // Find which tile is clicked
         int tileX = (x - gridShiftX) / tileSize;
         int tileY = (y - gridShiftY) / tileSize;
 
-        PlaceTile(tileX, tileY, 1);
-        
+        if(selectedTileID != 0){
+            PlaceTile(tileX, tileY, selectedTileID);
+        }
     }
+    
 
+    // Select tile
+    else {
+        // Sjekk om klikket er innenfor Available Tiles-området
+        int i = 0; // Indeks for tile
+
+        for (const auto& pair : tileSet->tiles) {
+            SDL_Rect tileRect = GetAvailableTileRect(i); // Bruker GetAvailableTileRect for å finne posisjon
+
+            // Sjekk om klikket er innenfor denne tile
+            if (x >= tileRect.x && x < tileRect.x + tileRect.w &&
+                y >= tileRect.y && y < tileRect.y + tileRect.h) {
+                // Klikket er innenfor denne tile, så oppdater den valgte tile-ID-en
+                selectedTileID = pair.first; // ID-en for den valgte tile
+                break; // Avslutt loopen når vi har funnet den valgte tile
+            }
+
+            i++; // Gå til neste tile
+        }
+    }
+}
+
+void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
+{
+    int i = 0; // tile id
+    for (const auto& pair : tileSet->tiles)
+    {
+        Tile* tile = pair.second;
+
+        if (tile != nullptr)
+        {
+            SDL_Rect destRect = GetAvailableTileRect(i);
+            SDL_Texture* texture = tile->GetTexture();
+
+            // Draw to screen
+            SDL_RenderCopy(renderer, texture, NULL, &destRect);
+
+            i++; // Next tile
+        }
+    }
+}
+
+SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const
+{
+    int shiftToRight = gridShiftX + (gridWidth + 1) * tileSize; // Startposisjon til høyre for gridet
+    int tileMargin = 5; // Margin mellom tile-ene
+    int row = tileIndex; // Rad nummer
+
+    SDL_Rect rect;
+    rect.x = shiftToRight;
+    rect.y = row * (tileSize + tileMargin) + gridShiftY;
+    rect.w = tileSize;
+    rect.h = tileSize;
+
+    return rect;
+}
+
+/// @brief Checks if the given mouse coordinates are inside the grid
+/// @param x 
+/// @param y 
+/// @return 
+bool LevelEditor::isInsideGrid(int x, int y) const
+{
+    return  x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
 }
