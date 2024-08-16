@@ -244,8 +244,7 @@ void LevelEditor::HandleMouseClick(int x, int y)
 
     // sjekk om innenfor grid
     if(x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize){
-        // Inside grid
-        // Find which tile is clicked
+        // Find position of the tile that is clicked
         int tileX = (x - gridShiftX) / tileSize;
         int tileY = (y - gridShiftY) / tileSize;
 
