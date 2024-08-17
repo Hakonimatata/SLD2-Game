@@ -158,8 +158,8 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
     gridShiftY = WinH * 0.1;
 
     // Fit a the grid in the window
-    tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
-
+    // tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
+    tileSize = 50;
 
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {

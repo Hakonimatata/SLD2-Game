@@ -21,7 +21,7 @@ class Game
         
         void handleEvents();
         void update();
-        void updateCamera();
+        void updateCamera(float deltaTime);
         void render();
         void clean();
 

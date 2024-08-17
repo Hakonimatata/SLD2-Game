@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 {
     // Todo: Add launcher for editor/game
 
-    LevelEditor* levelEditor = new LevelEditor(10, 10);
+    LevelEditor* levelEditor = new LevelEditor(15, 15);
 
     levelEditor->init("Level Editor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false);
 
@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
     Game* game = new Game();
     
     // Initialize Game
-    game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false, true);
+    bool twoPlayerMode = false;
+    game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false, twoPlayerMode);
 
     while (game->running())
     {
