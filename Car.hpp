@@ -10,7 +10,7 @@
 
 class Car {
 public:
-    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor, float physicsSpeedFactor = 75.0f);
+    Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor);
     ~Car();
 
     void HandleInput(const Uint8* state, const PlayerControls& controls);
@@ -44,9 +44,9 @@ private:
     float GetAngleSpeed();
 
     // Physical parameters adjustable by user
-    float physicsSpeedFactor;       // Multiplier for delta time => speed of all physics (set in constructor)
-    float acceleration = 0.2f;      // Car gas acceleration
-    float topSpeed;                 // Top speed of the car (set in constructor)
+    float physicsSpeedFactor = 0.1f;          // Multiplier for delta time => speed of all physics (set in constructor)
+    float acceleration = 0.2f;                  // Car gas acceleration
+    float topSpeed;                             // Top speed of the car (set in constructor)
     float rotationSpeed = 0.15f;                // Rotation speed of the car 
     float rotationMultiplierWhenDrift = 2.0f;   // Multiplier for rotation speed when drifting
     float friction = 0.01f;                     // Speed reduction when not accelerating

@@ -14,8 +14,8 @@ using namespace std;
 /// @param textureFile image path
 /// @param scaleFactor scales everything proportionaly
 /// @param physicsSpeedFactor speed of how fast physics acts (acceleration, turn speed, top speed etc)
-Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor, float physicsSpeedFactor) 
-    : posX(x), posY(y), physicsSpeedFactor(physicsSpeedFactor)
+Car::Car(SDL_Renderer* renderer, float x, float y, float speed, const std::string& textureFile, float scaleFactor) 
+    : posX(x), posY(y)
 {
     topSpeed = speed;
     
@@ -244,7 +244,7 @@ void Car::ApplyBoost()
 
 void Car::AdjustVelocityTowardsAngle()
 {
-    float lerpFactor = tractionPercentage * deltaTime;
+    float lerpFactor = tractionPercentage;
 
     float targetVelocityX = cos(angle) * velocity.getSize();
     float targetVelocityY = sin(angle) * velocity.getSize();

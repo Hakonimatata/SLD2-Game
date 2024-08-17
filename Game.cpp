@@ -86,6 +86,7 @@ bool Game::initSDL(const char* title, int xPos, int yPos, int width, int height,
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    // renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer)
     {
         cout << "Renderer creation failed: " << SDL_GetError() << endl;
@@ -256,7 +257,7 @@ void Game::updateCamera(float deltaTime)
     }
 
     // Lerp factor (controls the smoothness of the camera movement)
-    float lerpFactor = 4.0f; // Adjust this value to control the speed of the camera adjustment
+    float lerpFactor = 0.004f; // Adjust this value to control the speed of the camera adjustment
 
     // Add the same amount of movement to the map, as applied to the car under
     gridShiftX += targetShiftX * lerpFactor * deltaTime;
@@ -275,7 +276,7 @@ void Game::updateCamera(float deltaTime)
         players[1]->SetPosition(car2Pos.x, car2Pos.y);
     }
 
-    // Keep in screen! // Todo: implement
+    // Keep two players in screen! // Todo: implement
 }
 
 void Game::render()
@@ -362,11 +363,11 @@ void Game::loadLevel(const std::string &filename)
     ifs.close();
 }
 
-// Helper function to calculate delta time
+//  Get delta time in miliseconds
 float Game::getDeltaTime()
 {
     Uint32 currentTime = SDL_GetTicks();
-    float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // Konverter fra millisekunder til sekunder
+    float deltaTime = (currentTime - lastFrameTime); // 1000.0f; // Konverter fra millisekunder til sekunder
     lastFrameTime = currentTime;
 
     return deltaTime;
