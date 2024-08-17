@@ -156,6 +156,7 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
     // Set  grid shift based on window size
     gridShiftX = WinW * 0.1;
     gridShiftY = WinH * 0.1;
+
     // Fit a the grid in the window
     tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
 
@@ -261,7 +262,7 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
 void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
 {
     // Setter fargen for linjen (RGB: 255, 0, 0, full opasitet)
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);  // Background color
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 20, 20, 20, 255);
@@ -320,6 +321,7 @@ void LevelEditor::HandleLefttMouseClick(int x, int y)
 
 void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
 {
+    
     int i = 0; // tile id
     for (const auto& pair : tileSet->tiles)
     {
@@ -338,15 +340,21 @@ void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
     }
 }
 
-SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const
+SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
 {
-    int shiftToRight = gridShiftX + (gridWidth + 1) * tileSize; // Startposisjon til høyre for gridet
-    int tileMargin = 5; // Margin mellom tile-ene
-    int row = tileIndex; // Rad nummer
+    int xShift = gridShiftX;
+    int yShift  = gridShiftY;
+
+    int spaceBetweenTiles = 5;
+    int maxRows = (WinH - 2 * yShift) / (tileSize + spaceBetweenTiles);
+    if (maxRows <= 0){maxRows = 1;} // prevents crash
+
+    int xPosition = WinW - xShift - (tileSize + spaceBetweenTiles) - (tileSize + spaceBetweenTiles) * (tileIndex / maxRows);
+    int yPosition = yShift + (tileIndex % maxRows) * (tileSize + spaceBetweenTiles); 
 
     SDL_Rect rect;
-    rect.x = shiftToRight;
-    rect.y = row * (tileSize + tileMargin) + gridShiftY;
+    rect.x = xPosition;
+    rect.y = yPosition;
     rect.w = tileSize;
     rect.h = tileSize;
 

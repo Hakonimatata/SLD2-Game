@@ -230,7 +230,7 @@ void Game::update()
 void Game::updateCamera()
 {
     // Window mid-points
-    float centerX = WinW * 0.5; // Todo: find out why this is not WinW / 2
+    float centerX = WinW * 0.5;
     float centerY = WinH * 0.5;
     
     // Get the car's current position
@@ -259,19 +259,19 @@ void Game::updateCamera()
     float lerpFactor = 0.02f; // Adjust this value to control the speed of the camera adjustment
 
     // Add the same amount of movement to the map, as applied to the car under
-    gridShiftX += (targetShiftX) * lerpFactor;
-    gridShiftY += (targetShiftY) * lerpFactor;
+    gridShiftX += targetShiftX * lerpFactor;
+    gridShiftY += targetShiftY * lerpFactor;
 
     // Smoothly adjust the car towards the target shift
-    carPos.x += (targetShiftX) * lerpFactor;
-    carPos.y += (targetShiftY) * lerpFactor;
+    carPos.x += targetShiftX * lerpFactor;
+    carPos.y += targetShiftY * lerpFactor;
     players[0]->SetPosition(carPos.x, carPos.y);
 
     if(twoPlayerMode) // Update car 2 as well
     {
         FloatPoint car2Pos = players[1]->GetPos();
-        car2Pos.x += (targetShiftX) * lerpFactor;
-        car2Pos.y += (targetShiftY) * lerpFactor;
+        car2Pos.x += targetShiftX * lerpFactor;
+        car2Pos.y += targetShiftY * lerpFactor;
         players[1]->SetPosition(car2Pos.x, car2Pos.y);
     }
 
