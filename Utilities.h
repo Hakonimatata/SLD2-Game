@@ -25,3 +25,4 @@ struct PlayerControls {
     SDL_Scancode drift;
     SDL_Scancode boost;
 };
+

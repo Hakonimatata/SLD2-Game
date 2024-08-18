@@ -9,6 +9,7 @@
 #include "Utilities.h"
 #include "SDL2/SDL.h"
 #include "SDL_image.h"
+#include "Button.hpp"
 
 using namespace std;
 
@@ -19,13 +20,13 @@ public:
 
     void handleEvents();
     void update();
-    void updateCamera();
+    void updateCamera(); // Todo: implement to move map around
     void render();
     void clean();
 
     void init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
     bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
-
+    void initButtons();
 
     void PlaceTile(int x, int y, int tileID);
     void RotateTile(int x, int y);
@@ -34,7 +35,6 @@ public:
 
     void DrawMap(SDL_Renderer* renderer) const;
     void DrawGrid(SDL_Renderer* renderer) const;
-    Point GetTopLeftPointFromGridCoords(int x, int y) const;
     void HandleLefttMouseClick(int x, int y);
     bool running() { return isRunning; }
 
@@ -58,6 +58,9 @@ private:
     vector<vector<TileData>> grid; // Grid storing tile IDs
     TileSet* tileSet; // Reference to the TileSet
     Uint32 lastFrameTime;
+
+    vector<Button> buttons;
+
 };
 
 #endif // LEVELEDITOR_HPP

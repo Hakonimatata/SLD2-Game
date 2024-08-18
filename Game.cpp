@@ -57,7 +57,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     tileSet = new TileSet(renderer);
 
     // Load the level
-    loadLevel("level.txt");
+    loadLevel("Levels/level.txt");
     
 
     // Everything initialised correctly. Running.
@@ -134,24 +134,24 @@ void Game::initPlayerControls()
 {
     playerControls[0] = 
     {
-        SDL_SCANCODE_UP,     // Accelerate
-        SDL_SCANCODE_DOWN,   // Reverse
-        SDL_SCANCODE_LEFT,   // Turn left
-        SDL_SCANCODE_RIGHT,  // Turn right
+        SDL_SCANCODE_UP,      // Accelerate
+        SDL_SCANCODE_DOWN,    // Reverse
+        SDL_SCANCODE_LEFT,    // Turn left
+        SDL_SCANCODE_RIGHT,   // Turn right
         SDL_SCANCODE_RSHIFT,  // Drift
-        SDL_SCANCODE_PERIOD  // Boost
+        SDL_SCANCODE_PERIOD,  // Boost
     };
 
     if (twoPlayerMode)
     {
         playerControls[1] = 
         {
-            SDL_SCANCODE_W,      // Accelerate
-            SDL_SCANCODE_S,      // Reverse
-            SDL_SCANCODE_A,      // Turn left
-            SDL_SCANCODE_D,      // Turn right
-            SDL_SCANCODE_LCTRL,  // Drift
-            SDL_SCANCODE_LSHIFT  // Boost
+            SDL_SCANCODE_W,       // Accelerate
+            SDL_SCANCODE_S,       // Reverse
+            SDL_SCANCODE_A,       // Turn left
+            SDL_SCANCODE_D,       // Turn right
+            SDL_SCANCODE_LCTRL,   // Drift
+            SDL_SCANCODE_LSHIFT,  // Boost
         };
     }
 }
@@ -193,7 +193,7 @@ void Game::handleEvents()
             int newWidth = event.window.data1;
             int newHeight = event.window.data2;
 
-            // Resize elements before setting new windowsize. 
+            // Resize elements before setting new windowsize.
             // This is to get relative changes from previous window size.
             resizeElements(newWidth, newHeight);
             
@@ -220,16 +220,17 @@ void Game::update()
     // Get current delta time. This is used for smooth movement, not based on frame rate
     float deltaTime = getDeltaTime();
 
-    // Update players 
+    // Update players
     players[0]->Update(deltaTime);
     if(twoPlayerMode) {players[1]->Update(deltaTime);}
 
-    // Update camera (position of cars andmap) 
+    // Update camera (position of cars andmap)
     updateCamera(deltaTime);
 }
 
 void Game::updateCamera(float deltaTime)
 {
+    /*
     // Window mid-points
     float centerX = WinW * 0.5;
     float centerY = WinH * 0.5;
@@ -275,6 +276,7 @@ void Game::updateCamera(float deltaTime)
         car2Pos.y += targetShiftY * lerpFactor * deltaTime;
         players[1]->SetPosition(car2Pos.x, car2Pos.y);
     }
+    */
 
     // Keep two players in screen! // Todo: implement
 }
@@ -367,7 +369,7 @@ void Game::loadLevel(const std::string &filename)
 float Game::getDeltaTime()
 {
     Uint32 currentTime = SDL_GetTicks();
-    float deltaTime = (currentTime - lastFrameTime); // 1000.0f; // Konverter fra millisekunder til sekunder
+    float deltaTime = (currentTime - lastFrameTime); // in miliseconds
     lastFrameTime = currentTime;
 
     return deltaTime;

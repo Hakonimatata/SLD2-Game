@@ -64,10 +64,10 @@ void LevelEditor::handleEvents()
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
-
+    // Todo: implement buttons
     // Temp save to file
     if (state[SDL_SCANCODE_S]) {
-        SaveLevel("level.txt");
+        SaveLevel("Level/level.txt");
     }
 }
 
@@ -89,7 +89,9 @@ void LevelEditor::render()
 
     // Draw available tiles
     DrawAvailableTiles(renderer);
-    
+
+    // Draw buttons in buttons vector
+    for (Button& button : buttons) {renderButton(renderer, button);}    
 
     // Render to screen
     SDL_RenderPresent(renderer);
@@ -156,10 +158,8 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
     // Set  grid shift based on window size
     gridShiftX = WinW * 0.1;
     gridShiftY = WinH * 0.1;
-
-    // Fit a the grid in the window
-    // tileSize = min((height - 2* gridShiftY) / gridHeight, (width - 2* gridShiftX) / gridWidth);
-    tileSize = 50;
+    
+    tileSize = 50; // Sets the size of the tiles in the editor
 
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {
@@ -167,13 +167,15 @@ void LevelEditor::init(const char *title, int xPos, int yPos, int width, int hei
         return;
     }
 
-
-    isRunning = true;
-    lastFrameTime = SDL_GetTicks();
-
-
     // Initialize the set of tiles
     tileSet = new TileSet(renderer);
+
+    // Initialize buttons
+    initButtons();
+
+    // ----------Level editor running successfully---------------
+    isRunning = true;
+    lastFrameTime = SDL_GetTicks();
 }
 
 bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
@@ -208,7 +210,13 @@ bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int 
     return true;
 }
 
-
+void LevelEditor::initButtons()
+{
+    Button button1;
+    button1.rect = { gridShiftX, gridShiftY + gridHeight * tileSize, 200, 100 }; // xPos, yPos, width, height
+    // addCallback(button1, this, &LevelEditor::Function); // Replace Function with a void method without inputs
+    buttons.push_back(button1);
+}
 
 void LevelEditor::LoadLevel(const std::string& filename) {
     std::ifstream ifs(filename);
@@ -275,19 +283,10 @@ void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
     }
 }
 
-Point LevelEditor::GetTopLeftPointFromGridCoords(int x, int y) const
-{
-    int GridXPos = gridShiftX + x * tileSize;
-    int GridYPos = gridShiftY + y * tileSize;
-
-    return Point{GridXPos, GridYPos};
-}
-
 void LevelEditor::HandleLefttMouseClick(int x, int y)
 {
-    // sjekk om innenfor grid
+    // Placing tiles
     if(isInsideGrid(x, y)){
-        // Inside grid
         // Find which tile is clicked
         int tileX = (x - gridShiftX) / tileSize;
         int tileY = (y - gridShiftY) / tileSize;
@@ -297,26 +296,24 @@ void LevelEditor::HandleLefttMouseClick(int x, int y)
         }
     }
     
+    // Selection of tiles
+    int i = 0; // Indeks for tile
+    for (const auto& pair : tileSet->tiles) {
+        SDL_Rect tileRect = GetAvailableTileRect(i); // Bruker GetAvailableTileRect for å finne posisjon
 
-    // Select tile
-    else {
-        // Sjekk om klikket er innenfor Available Tiles-området
-        int i = 0; // Indeks for tile
-
-        for (const auto& pair : tileSet->tiles) {
-            SDL_Rect tileRect = GetAvailableTileRect(i); // Bruker GetAvailableTileRect for å finne posisjon
-
-            // Sjekk om klikket er innenfor denne tile
-            if (x >= tileRect.x && x < tileRect.x + tileRect.w &&
-                y >= tileRect.y && y < tileRect.y + tileRect.h) {
-                // Klikket er innenfor denne tile, så oppdater den valgte tile-ID-en
-                selectedTileID = pair.first; // ID-en for den valgte tile
-                break; // Avslutt loopen når vi har funnet den valgte tile
-            }
-
-            i++; // Gå til neste tile
+        // Sjekk om klikket er innenfor denne tile
+        if (x >= tileRect.x && x < tileRect.x + tileRect.w &&
+            y >= tileRect.y && y < tileRect.y + tileRect.h) {
+            // Klikket er innenfor denne tile, så oppdater den valgte tile-ID-en
+            selectedTileID = pair.first; // ID-en for den valgte tile
+            break; // Avslutt loopen når vi har funnet den valgte tile
         }
+
+        i++; // Gå til neste tile
     }
+
+    handleButtonClick(x, y, buttons);
+    
 }
 
 void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const

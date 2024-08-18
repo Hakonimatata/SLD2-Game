@@ -21,7 +21,6 @@ class Game
         
         void handleEvents();
         void update();
-        void updateCamera(float deltaTime);
         void render();
         void clean();
 
@@ -31,7 +30,7 @@ class Game
     private:
         // Ajustable parameters
         const float carScaleFactor = 0.4f;  // Currently used to set the scale of everything for the car (into the construcotr)
-        float tileSize = 64;                // Tilesize <=> map size
+        float tileSize = 64;                // Tilesize dictates the map size
 
         // Functions
         void resizeElements(int newWidth, int newHeight);
@@ -40,6 +39,7 @@ class Game
         void initPlayers();
         void initPlayerControls();
         void DrawMap(SDL_Renderer* renderer) const;
+        void updateCamera(float deltaTime);
         float getDeltaTime();
 
        
