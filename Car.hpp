@@ -44,7 +44,7 @@ private:
     float GetAngleSpeed();
 
     // Physical parameters adjustable by user
-    float physicsSpeedFactor = 0.1f;          // Multiplier for delta time => speed of all physics (set in constructor)
+    float physicsSpeedFactor = 100.0f;          // Multiplier for delta time => speed of all physics
     float acceleration = 0.2f;                  // Car gas acceleration
     float topSpeed;                             // Top speed of the car (set in constructor)
     float rotationSpeed = 0.15f;                // Rotation speed of the car 

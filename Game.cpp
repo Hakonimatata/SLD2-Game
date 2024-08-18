@@ -6,10 +6,7 @@
 
 using namespace std;
 
-Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), lastFrameTime(0) 
-{
-       
-}
+Game::Game() : isRunning(false), window(nullptr), renderer(nullptr), lastFrameTime(0) {}
 
 Game::~Game()
 {
@@ -29,18 +26,6 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     gridShiftX = 0; 
     gridShiftY = 0;
 
-    // Todo: Set a clean background picture
-
-    // backgroundSpriteRect.h = height;
-    // backgroundSpriteRect.w = width;
-    // backgroundSpriteRect.x = 0;
-    // backgroundSpriteRect.y = 0;
-    // if (!loadBackgroundTexture("assets/RaceTrack.png"))
-    // {
-    //     isRunning = false;
-    //     return;
-    // }
-    
     // Initialize SDL
     if (!initSDL(title, xPos, yPos, width, height, fullscreen))
     {
@@ -95,27 +80,6 @@ bool Game::initSDL(const char* title, int xPos, int yPos, int width, int height,
 
     // Draw a white background
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    return true;
-}
-
-bool Game::loadBackgroundTexture(const std::string& filepath)
-{
-    SDL_Surface* tempSurface = IMG_Load(filepath.c_str());
-    if (!tempSurface)
-    {
-        cout << "Failed to load surface: " << SDL_GetError() << endl;
-        return false;
-    }
-
-    backgroundTexture = SDL_CreateTextureFromSurface(renderer, tempSurface);
-    SDL_FreeSurface(tempSurface);
-
-    if (!backgroundTexture)
-    {
-        cout << "Failed to load texture: " << SDL_GetError() << endl;
-        return false;
-    }
 
     return true;
 }
@@ -225,12 +189,11 @@ void Game::update()
     if(twoPlayerMode) {players[1]->Update(deltaTime);}
 
     // Update camera (position of cars andmap)
-    updateCamera(deltaTime);
+    updateCamera();
 }
 
-void Game::updateCamera(float deltaTime)
+void Game::updateCamera()
 {
-    /*
     // Window mid-points
     float centerX = WinW * 0.5;
     float centerY = WinH * 0.5;
@@ -258,25 +221,24 @@ void Game::updateCamera(float deltaTime)
     }
 
     // Lerp factor (controls the smoothness of the camera movement)
-    float lerpFactor = 0.004f; // Adjust this value to control the speed of the camera adjustment
+    float lerpFactor = 0.1; // Adjust this value to control the speed of the camera adjustment [0, 1]
 
     // Add the same amount of movement to the map, as applied to the car under
-    gridShiftX += targetShiftX * lerpFactor * deltaTime;
-    gridShiftY += targetShiftY * lerpFactor * deltaTime;
+    gridShiftX += targetShiftX * lerpFactor;
+    gridShiftY += targetShiftY * lerpFactor;
 
     // Smoothly adjust the car towards the target shift
-    carPos.x += targetShiftX * lerpFactor * deltaTime;
-    carPos.y += targetShiftY * lerpFactor * deltaTime;
+    carPos.x += targetShiftX * lerpFactor;
+    carPos.y += targetShiftY * lerpFactor;
     players[0]->SetPosition(carPos.x, carPos.y);
 
     if(twoPlayerMode) // Update car 2 as well
     {
         FloatPoint car2Pos = players[1]->GetPos();
-        car2Pos.x += targetShiftX * lerpFactor * deltaTime;
-        car2Pos.y += targetShiftY * lerpFactor * deltaTime;
+        car2Pos.x += targetShiftX * lerpFactor;
+        car2Pos.y += targetShiftY * lerpFactor;
         players[1]->SetPosition(car2Pos.x, car2Pos.y);
     }
-    */
 
     // Keep two players in screen! // Todo: implement
 }
@@ -288,9 +250,9 @@ void Game::render()
 
     // ------------Start Adding Render Functions Here------------
     
-    // Render background
-    // SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundSpriteRect);
-
+    // Black background
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect(renderer, NULL);
 
     // Render map
     DrawMap(renderer);
@@ -365,11 +327,11 @@ void Game::loadLevel(const std::string &filename)
     ifs.close();
 }
 
-//  Get delta time in miliseconds
+//  Get delta time in seconds
 float Game::getDeltaTime()
 {
     Uint32 currentTime = SDL_GetTicks();
-    float deltaTime = (currentTime - lastFrameTime); // in miliseconds
+    float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // in seconds 
     lastFrameTime = currentTime;
 
     return deltaTime;

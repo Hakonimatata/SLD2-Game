@@ -165,8 +165,15 @@ void Car::ScaleEverything(float scaleFactor)
 void Car::Accelerate()
 {
     // Apply acceleration only in direction of car
-    velocity.x += acceleration * cos(angle) * deltaTime;
-    velocity.y += acceleration * sin(angle) * deltaTime;
+
+    int accelerationMultiplier = 1.0f;
+    if(isDrifting)
+    {
+        accelerationMultiplier = 1.5f;
+    }
+
+    velocity.x += acceleration * cos(angle) * deltaTime * accelerationMultiplier;
+    velocity.y += acceleration * sin(angle) * deltaTime * accelerationMultiplier;
 }
 
 void Car::Reverse()

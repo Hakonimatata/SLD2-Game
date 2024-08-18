@@ -26,12 +26,11 @@ int main(int argc, char* argv[])
 
     levelEditor->clean();
 
-
     // Create instance of Game
     Game* game = new Game();
     
     // Initialize Game
-    bool twoPlayerMode = false;
+    bool twoPlayerMode = true;
     game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false, twoPlayerMode);
 
     while (game->running())

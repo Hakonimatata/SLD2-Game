@@ -35,11 +35,10 @@ class Game
         // Functions
         void resizeElements(int newWidth, int newHeight);
         bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
-        bool loadBackgroundTexture(const std::string& filepath);
         void initPlayers();
         void initPlayerControls();
         void DrawMap(SDL_Renderer* renderer) const;
-        void updateCamera(float deltaTime);
+        void updateCamera();
         float getDeltaTime();
 
        
