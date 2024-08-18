@@ -24,6 +24,9 @@ void LevelEditor::handleEvents()
     SDL_Event event;
     SDL_PollEvent(&event);
 
+    int mouseX = 0; // Declare outside the switch-case
+    int mouseY = 0;
+
     switch (event.type)
     {
     case SDL_QUIT:
@@ -42,21 +45,33 @@ void LevelEditor::handleEvents()
             WinH = newHeight;
         }
         break;
+
+    case SDL_MOUSEMOTION: // Catch mouse movement
+        mouseX = event.motion.x;
+        mouseY = event.motion.y;
+
+        // Check if the mouse is hovering over the grid
+        if (isInsideGrid(mouseX, mouseY)) {
+            hoverTileX = (mouseX - gridShiftX) / tileSize;
+            hoverTileY = (mouseY - gridShiftY) / tileSize;
+        } else {
+            hoverTileX = -1;
+            hoverTileY = -1;
+        }
+        break;
     
     case SDL_MOUSEBUTTONDOWN:
+        mouseX = event.button.x;
+        mouseY = event.button.y;
         
         if (event.button.button == SDL_BUTTON_LEFT){
-
-            HandleLefttMouseClick(event.button.x, event.button.y);
-
+            HandleLefttMouseClick(mouseX, mouseY);
         }
         if (event.button.button == SDL_BUTTON_RIGHT){
-
-            // Todo: change to HandleLeftMouseClick?
-            RotateTile(event.button.x, event.button.y);
+            RotateTile(mouseX, mouseY);
         }
-
         break;
+
     default:
         break;
     }
@@ -70,6 +85,7 @@ void LevelEditor::handleEvents()
         SaveLevel("Level/level.txt");
     }
 }
+
 
 void LevelEditor::update()
 {
@@ -247,7 +263,7 @@ void LevelEditor::LoadLevel(const std::string& filename) {
     ifs.close();
 }
 
-
+/*
 void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
     // Check each grid position for tile and draw
     for (int y = 0; y < gridHeight; ++y) {
@@ -265,6 +281,36 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
         }
     }
 }
+*/
+
+void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
+    for (int y = 0; y < gridHeight; ++y) {
+        for (int x = 0; x < gridWidth; ++x) {
+            const TileData& tileData = grid[y][x];
+            int drawX = gridShiftX + x * tileSize;
+            int drawY = gridShiftY + y * tileSize;
+
+            // Tegn flisene som allerede er plassert
+            if (tileData.id != 0) {
+                Tile* tile = tileSet->GetTile(tileData.id);
+                if (tile != nullptr) {
+                    tile->SetGridPosition(x, y);
+                    tile->SetRotation(tileData.rotation);
+                    tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+                }
+            }
+
+            // Tegn den valgte flisen under musen med opasitet
+            if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileID != 0) {
+                Tile* selectedTile = tileSet->GetTile(selectedTileID);
+                if (selectedTile != nullptr) {
+                    DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150);
+                }
+            }
+        }
+    }
+}
+
 
 
 void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
@@ -336,6 +382,27 @@ void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
         }
     }
 }
+
+void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, Tile* tile, int x, int y, Uint8 opacity) const
+{
+    SDL_Rect destRect;
+    destRect.x = x;
+    destRect.y = y;
+    destRect.w = tileSize;
+    destRect.h = tileSize;
+
+    SDL_Texture* texture = tile->GetTexture();
+
+    // Set tile texture opacity
+    SDL_SetTextureAlphaMod(texture, opacity);
+
+    // Draw the tile with the adjusted opacity
+    SDL_RenderCopy(renderer, texture, NULL, &destRect);
+
+    // Reset opacity for future renders
+    SDL_SetTextureAlphaMod(texture, 255);
+}
+
 
 SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
 {
