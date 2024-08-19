@@ -147,7 +147,7 @@ void Car::StartBoost(float multiplier, float duration)
     }
 }
 
-void Car::ScaleEverything(float scaleFactor)
+void Car::ScaleEverything(float scaleFactor) // Todo: Make physics work for all zomming
 {
     // Todo: check if errors occur
     topSpeed *= scaleFactor;
@@ -161,6 +161,7 @@ void Car::ScaleEverything(float scaleFactor)
     posX *= scaleFactor;
     posY *= scaleFactor;
 }
+
 
 void Car::Accelerate()
 {

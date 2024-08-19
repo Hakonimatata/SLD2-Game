@@ -263,26 +263,6 @@ void LevelEditor::LoadLevel(const std::string& filename) {
     ifs.close();
 }
 
-/*
-void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
-    // Check each grid position for tile and draw
-    for (int y = 0; y < gridHeight; ++y) {
-        for (int x = 0; x < gridWidth; ++x) {
-            // Get tile data from grid point
-            const TileData& tileData = grid[y][x];
-            if (tileData.id != 0) {
-                Tile* tile = tileSet->GetTile(tileData.id);
-                if (tile != nullptr) {
-                    tile->SetGridPosition(x, y);
-                    tile->SetRotation(tileData.rotation); // Set rotation for rendering
-                    tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
-                }
-            }
-        }
-    }
-}
-*/
-
 void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
     for (int y = 0; y < gridHeight; ++y) {
         for (int x = 0; x < gridWidth; ++x) {
