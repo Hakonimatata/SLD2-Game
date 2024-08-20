@@ -172,7 +172,7 @@ void Car::Accelerate()
     {
         accelerationMultiplier = 1.5f;
     }
-
+    
     velocity.x += acceleration * cos(angle) * deltaTime * accelerationMultiplier;
     velocity.y += acceleration * sin(angle) * deltaTime * accelerationMultiplier;
 }

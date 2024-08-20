@@ -79,10 +79,34 @@ void LevelEditor::handleEvents()
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
+    MooveCamera(state);
+
     // Todo: implement buttons
     // Temp save to file
     if (state[SDL_SCANCODE_S]) {
         SaveLevel("Level/level.txt");
+    }
+
+}
+
+void LevelEditor::MooveCamera(const Uint8* state)
+{
+    // Move camera
+    if(state[SDL_SCANCODE_LEFT]) 
+    {
+        gridShiftX += 10;
+    }
+    else if(state[SDL_SCANCODE_RIGHT])
+    {
+        gridShiftX -= 10;
+    }
+    if(state[SDL_SCANCODE_UP])
+    {
+        gridShiftY += 10;
+    }
+    else if(state[SDL_SCANCODE_DOWN])
+    {
+        gridShiftY -= 10;
     }
 }
 
@@ -386,8 +410,8 @@ void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, Tile* tile, int x,
 
 SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
 {
-    int xShift = gridShiftX;
-    int yShift  = gridShiftY;
+    int xShift = 20;
+    int yShift  = 20;
 
     int spaceBetweenTiles = 5;
     int maxRows = (WinH - 2 * yShift) / (tileSize + spaceBetweenTiles);

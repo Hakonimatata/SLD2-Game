@@ -19,6 +19,7 @@ public:
     ~LevelEditor();
 
     void handleEvents();
+    void MooveCamera(const Uint8 *state);
     void update();
     void updateCamera(); // Todo: implement to move map around
     void render();
