@@ -156,7 +156,7 @@ void Car::ScaleEverything(float scaleFactor) // Todo: Make physics work for all 
     spriteRect.w = spriteWidth;
     spriteRect.h = spriteHeight;
     acceleration *= scaleFactor;
-    friction *= scaleFactor;
+    // friction *= scaleFactor; // Dont scale friction, because it is scaled based on current speed
 
     posX *= scaleFactor;
     posY *= scaleFactor;
@@ -273,6 +273,7 @@ void Car::ApplyFriction()
 {
     velocity.x -= velocity.x * friction * deltaTime;
     velocity.y -= velocity.y * friction * deltaTime;
+    cout << deltaTime * friction << endl;
 }
 
 void Car::RestrictSpeedToTopSpeed()
