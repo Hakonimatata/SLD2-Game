@@ -39,6 +39,8 @@ public:
     bool running() { return isRunning; }
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
+    void MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer *renderer, int tileId) const;
+    void MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer *renderer) const;
     SDL_Rect GetAvailableTileRect(int tileIndex) const;
 
     bool isInsideGrid(int x, int y) const;

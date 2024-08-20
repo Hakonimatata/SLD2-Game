@@ -319,21 +319,35 @@ void LevelEditor::HandleLefttMouseClick(int x, int y)
 void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
 {
     
-    int i = 0; // tile id
+    int tileId = 0;
     for (const auto& pair : tileSet->tiles)
     {
         Tile* tile = pair.second;
 
         if (tile != nullptr)
         {
-            SDL_Rect destRect = GetAvailableTileRect(i);
+            SDL_Rect destRect = GetAvailableTileRect(tileId);
             SDL_Texture* texture = tile->GetTexture();
 
             // Draw to screen
+            MarkSelectedRect(destRect, 2, renderer, tile->GetID() );
             SDL_RenderCopy(renderer, texture, NULL, &destRect);
 
-            i++; // Next tile
+            tileId++; // Next tile
         }
+    }
+}
+
+void LevelEditor::MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer* renderer, int tileId) const
+{
+    if (tileId == selectedTileID){        
+        SDL_Rect rect;
+        rect.x = selectedRect.x - thickness;
+        rect.y = selectedRect.y - thickness;
+        rect.w = selectedRect.w + 2*thickness;
+        rect.h = selectedRect.h + 2*thickness;
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Rødfarge
+        SDL_RenderFillRect(renderer, &rect);
     }
 }
 
