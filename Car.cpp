@@ -147,7 +147,7 @@ void Car::StartBoost(float multiplier, float duration)
     }
 }
 
-void Car::ScaleEverything(float scaleFactor)
+void Car::ScaleEverything(float scaleFactor) // Todo: Make physics work for all zomming
 {
     // Todo: check if errors occur
     topSpeed *= scaleFactor;
@@ -156,11 +156,12 @@ void Car::ScaleEverything(float scaleFactor)
     spriteRect.w = spriteWidth;
     spriteRect.h = spriteHeight;
     acceleration *= scaleFactor;
-    friction *= scaleFactor;
+    // friction *= scaleFactor; // Dont scale friction, because it is scaled based on current speed
 
     posX *= scaleFactor;
     posY *= scaleFactor;
 }
+
 
 void Car::Accelerate()
 {
@@ -171,7 +172,7 @@ void Car::Accelerate()
     {
         accelerationMultiplier = 1.5f;
     }
-
+    
     velocity.x += acceleration * cos(angle) * deltaTime * accelerationMultiplier;
     velocity.y += acceleration * sin(angle) * deltaTime * accelerationMultiplier;
 }
@@ -272,6 +273,7 @@ void Car::ApplyFriction()
 {
     velocity.x -= velocity.x * friction * deltaTime;
     velocity.y -= velocity.y * friction * deltaTime;
+    cout << deltaTime * friction << endl;
 }
 
 void Car::RestrictSpeedToTopSpeed()

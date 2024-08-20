@@ -19,6 +19,7 @@ public:
     ~LevelEditor();
 
     void handleEvents();
+    void MooveCamera(const Uint8 *state);
     void update();
     void updateCamera(); // Todo: implement to move map around
     void render();
@@ -39,8 +40,8 @@ public:
     bool running() { return isRunning; }
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
+    void DrawTileWithOpacity(SDL_Renderer *renderer, Tile *tile, int x, int y, Uint8 opacity) const;
     void MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer *renderer, int tileId) const;
-    void MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer *renderer) const;
     SDL_Rect GetAvailableTileRect(int tileIndex) const;
 
     bool isInsideGrid(int x, int y) const;
@@ -56,6 +57,10 @@ private:
     int WinW, WinH;
     int gridWidth, gridHeight;
     int gridShiftX, gridShiftY;
+
+    int hoverTileX = -1; // X posisjon til "hovered" tile
+    int hoverTileY = -1; // Y posisjon til "hovered" tile
+    
     int tileSize;
     vector<vector<TileData>> grid; // Grid storing tile IDs
     TileSet* tileSet; // Reference to the TileSet

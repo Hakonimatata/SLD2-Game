@@ -34,14 +34,15 @@ class Game
 
         // Functions
         void resizeElements(int newWidth, int newHeight);
-        bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
+        void ResizeMap(float scaleFactor);
+        bool initSDL(const char *title, int xPos, int yPos, int width, int height, bool fullscreen);
         void initPlayers();
         void initPlayerControls();
         void DrawMap(SDL_Renderer* renderer) const;
         void updateCamera();
+        void ZoomCamera(float ZoomSpeed);
         float getDeltaTime();
 
-       
         int WinW, WinH;                   // Original width and height
         int gridWidth, gridHeight;        // Map grid size
         float gridShiftX, gridShiftY;

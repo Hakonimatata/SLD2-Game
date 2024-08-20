@@ -173,6 +173,14 @@ void Game::handleEvents()
     // Get player input from keyboard
     const Uint8* state = SDL_GetKeyboardState(NULL);
 
+    // zoom in and out
+    if(state[SDL_SCANCODE_O]) {
+        ZoomCamera(1-getDeltaTime());
+    }
+    if(state[SDL_SCANCODE_I]) {
+        ZoomCamera(1+getDeltaTime());
+    }
+
     // Handle input for all players
     for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
         players[i]->HandleInput(state, playerControls[i]);
@@ -241,7 +249,20 @@ void Game::updateCamera()
     }
 
     // Keep two players in screen! // Todo: implement
+
 }
+
+void Game::ZoomCamera(float zoomFactor)
+{
+    // Resize map (tilesize)
+    ResizeMap(zoomFactor);    
+
+    // Skaler alle spillere
+    for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
+        players[i]->ScaleEverything(zoomFactor);
+    }
+}
+    
 
 void Game::render()
 {
@@ -281,20 +302,20 @@ void Game::resizeElements(int newWidth, int newHeight)
     // Beregn skaleringsfaktoren basert på den nye bredden
     float scaleFactor = static_cast<float>(newWidth) / static_cast<float>(WinW);
 
-    // Resize background
-    backgroundSpriteRect.w = newWidth;
-    backgroundSpriteRect.h = static_cast<int>(WinH * scaleFactor);  // Juster høyden basert på skaleringsfaktoren
-
     // Resize map (tilesize)
-    tileSize *= scaleFactor;
-    gridShiftX *= scaleFactor;
-    gridShiftY *= scaleFactor;
-    
+    ResizeMap(scaleFactor);    
 
     // Skaler alle spillere
     for(int i = 0; i < (twoPlayerMode ? 2 : 1); ++i) {
         players[i]->ScaleEverything(scaleFactor);
     }
+}
+
+void Game::ResizeMap(float scaleFactor)
+{
+    tileSize *= scaleFactor;
+    gridShiftX *= scaleFactor;
+    gridShiftY *= scaleFactor;
 }
 
 void Game::loadLevel(const std::string &filename)
