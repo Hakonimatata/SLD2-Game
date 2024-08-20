@@ -146,10 +146,27 @@ void LevelEditor::clean()
 }
 
 void LevelEditor::PlaceTile(int x, int y, int tileID) {
-    if (x >= 0 && x < gridWidth && y >= 0 && y < gridHeight) {
-        grid[y][x] = TileData(tileID, 0); // Set the tile ID at the specified grid position with rotation 0
+    Tile* tile = tileSet->GetTile(tileID);
+    if (tile) {
+        int tileWidth = tile->GetWidth();
+        int tileHeight = tile->GetHeight();
+
+        // Sørg for at plasseringen er innenfor gridets grenser
+        for (int offsetY = 0; offsetY < tileHeight; ++offsetY) {
+            for (int offsetX = 0; offsetX < tileWidth; ++offsetX) {
+                int gridX = x + offsetX;
+                int gridY = y + offsetY;
+
+                // Sjekk om posisjonen er innenfor gridets grenser
+                if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight) {
+                    grid[gridY][gridX] = TileData(tileID, 0);
+                }
+            }
+        }
     }
 }
+
+
 
 void LevelEditor::RotateTile(int x, int y)
 {
@@ -161,8 +178,15 @@ void LevelEditor::RotateTile(int x, int y)
 
         // Get the tile at that position
         TileData& tileData = grid[tileY][tileX];
+
+        // Get tile size
+        int tileWidth = tileSet->GetTile(tileData.id)->GetWidth();
+        int tileHeight = tileSet->GetTile(tileData.id)->GetHeight();
+
+
+
         if (tileData.id != 0) {
-            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees
+            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees                  
         }
     }
 }
@@ -287,6 +311,33 @@ void LevelEditor::LoadLevel(const std::string& filename) {
     ifs.close();
 }
 
+// void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
+//     for (int y = 0; y < gridHeight; ++y) {
+//         for (int x = 0; x < gridWidth; ++x) {
+//             const TileData& tileData = grid[y][x];
+//             int drawX = gridShiftX + x * tileSize;
+//             int drawY = gridShiftY + y * tileSize;
+
+//             // Tegn flisene som allerede er plassert
+//             if (tileData.id != 0) {
+//                 Tile* tile = tileSet->GetTile(tileData.id);
+//                 if (tile != nullptr) {
+//                     tile->SetGridPosition(x, y);
+//                     tile->SetRotation(tileData.rotation);
+//                     tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+//                 }
+//             }
+
+//             // Tegn den valgte flisen under musen med opasitet
+//             if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileID != 0) {
+//                 Tile* selectedTile = tileSet->GetTile(selectedTileID);
+//                 if (selectedTile != nullptr) {
+//                     DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150);
+//                 }
+//             }
+//         }
+//     }
+// }
 void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
     for (int y = 0; y < gridHeight; ++y) {
         for (int x = 0; x < gridWidth; ++x) {
@@ -298,9 +349,17 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
             if (tileData.id != 0) {
                 Tile* tile = tileSet->GetTile(tileData.id);
                 if (tile != nullptr) {
-                    tile->SetGridPosition(x, y);
-                    tile->SetRotation(tileData.rotation);
-                    tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+                    int tileWidth = tile->GetWidth();
+                    int tileHeight = tile->GetHeight();
+
+                    
+
+                    // Bare tegn flisen hvis det er øvre venstre hjørne av flisen
+                    if (x % tileWidth == 0 && y % tileHeight == 0) {
+                        tile->SetGridPosition(x, y);
+                        tile->SetRotation(tileData.rotation);
+                        tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
+                    }
                 }
             }
 
@@ -308,12 +367,13 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
             if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileID != 0) {
                 Tile* selectedTile = tileSet->GetTile(selectedTileID);
                 if (selectedTile != nullptr) {
-                    DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150);
+                    DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150); // 150 er opasiteten (kan justeres)
                 }
             }
         }
     }
 }
+
 
 
 
@@ -387,25 +447,19 @@ void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
     }
 }
 
-void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, Tile* tile, int x, int y, Uint8 opacity) const
-{
-    SDL_Rect destRect;
-    destRect.x = x;
-    destRect.y = y;
-    destRect.w = tileSize;
-    destRect.h = tileSize;
-
+void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, Tile* tile, int x, int y, int opacity) const {
     SDL_Texture* texture = tile->GetTexture();
-
-    // Set tile texture opacity
+    
+    // Sett alpha (gjennomsiktighet)
     SDL_SetTextureAlphaMod(texture, opacity);
 
-    // Draw the tile with the adjusted opacity
-    SDL_RenderCopy(renderer, texture, NULL, &destRect);
+    SDL_Rect destRect = { x, y, tileSize * tile->GetWidth(), tileSize * tile->GetHeight()};
+    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, tile->GetRotation(), nullptr, SDL_FLIP_NONE);
 
-    // Reset opacity for future renders
+    // Sett alpha tilbake til fullt synlig for å unngå at andre fliser også blir påvirket
     SDL_SetTextureAlphaMod(texture, 255);
 }
+
 
 
 SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
@@ -433,7 +487,12 @@ SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the t
 /// @param x 
 /// @param y 
 /// @return 
-bool LevelEditor::isInsideGrid(int x, int y) const
-{
-    return  x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
+// bool LevelEditor::isInsideGrid(int x, int y) const
+// {
+//     return  x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
+// }
+
+bool LevelEditor::isInsideGrid(int x, int y) const {
+    return x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && 
+           y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
 }

@@ -11,7 +11,7 @@
 class Tile {
 public:
     // Constructor
-    Tile(int id, SDL_Texture* texture, const std::vector<Hitbox>& hitboxes, int gridX, int gridY);
+    Tile(int id, SDL_Texture* texture, const std::vector<Hitbox>& hitboxes, int gridX, int gridY, int width, int height);
 
     // Rendering the tile
     void Render(SDL_Renderer* renderer, int tileSize, int gridShiftX, int gridShiftY);
@@ -24,6 +24,8 @@ public:
     int GetGridX() const { return gridX; }
     int GetGridY() const { return gridY; }
     int GetRotation() const { return rotation; }
+    int GetWidth() const { return width; }
+    int GetHeight() const { return height; }
 
     // Setters
     void SetGridPosition(int x, int y) { gridX = x; gridY = y; }
@@ -34,16 +36,19 @@ private:
     int id;                             // Unique ID for the tile
     SDL_Texture* texture;               // The sprite texture for the tile
     std::vector<Hitbox> hitboxes;       // List of hitboxes associated with this tile
-    int gridX, gridY;                   // Tile position in the grid
+    int gridX, gridY;                   // Tile position in the grid (gridcoords)
     int rotation;                       // Rotation angle in degrees (0, 90, 180, 270)
+    int width, height;                  // Width and height of the tile (in tiles)
 };
 
 
 struct TileData {
     int id;
     int rotation;
+    int xPos;
+    int yPos;
 
-    TileData(int id = 0, int rotation = 0) : id(id), rotation(rotation) {}
+    TileData(int id = 0, int rotation = 0, int xPos = 0, int yPos = 0) : id(id), rotation(rotation), xPos(xPos), yPos(yPos) {}
 };
 
 

@@ -15,7 +15,7 @@ public:
     ~TileSet();
 
     // Legg til en tile i settet
-    void AddTile(int id, const std::string& imagePath, const std::vector<Hitbox>& hitboxes);
+    void AddTile(int id, const std::string& imagePath, const std::vector<Hitbox>& hitboxes, int width, int height);
     
     // Hent en tile basert på ID
     Tile* GetTile(int id) const;

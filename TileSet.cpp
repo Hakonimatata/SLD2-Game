@@ -5,17 +5,17 @@
 TileSet::TileSet(SDL_Renderer* renderer) : renderer(renderer) 
 {
     // Load tiles
-    AddTile(1, "assets/Tiles/Flat.png", /* hitboxes. Tomt nå */ {});
-    AddTile(2, "assets/Tiles/FlatAngled.png", /* hitboxes. Tomt nå */ {});
-    AddTile(3, "assets/Tiles/FlatAngledInv.png", /* hitboxes. Tomt på højre */ {});
-    AddTile(4, "assets/Tiles/Grass.png", /* hitboxes. Tomt på venstre */ {});
-    AddTile(5, "assets/Tiles/InnerTurn.png", /* hitboxes. Tomt på højre og venstre */ {});
-    AddTile(6, "assets/Tiles/OuterTurn.png", /* hitboxes. Tomt på venstre og højre */ {});
-    AddTile(7, "assets/Tiles/Road.png", /* hitboxes. Tomt på højre og venstre */ {});
-    AddTile(8, "assets/Tiles/SlowInnerTurn.png", /* hitboxes. Tomt på højre og venstre */ {});
-    AddTile(9, "assets/Tiles/SlowInnerTurnInv.png", /* hitboxes. Tomt på højre og venstre */ {});
-    AddTile(10, "assets/Tiles/SlowOuterTurn.png", /* hitboxes. Tomt på højre og venstre */ {});
-    AddTile(11, "assets/Tiles/SlowOuterTurnInv.png", /* hitboxes. Tomt på højre og venstre */ {});
+    AddTile(1, "assets/Tiles/Flat.png", /* hitboxes. Tomt nå */ {}, 1, 2);
+    AddTile(2, "assets/Tiles/FlatAngled.png", /* hitboxes. Tomt nå */ {}, 1, 1);
+    AddTile(3, "assets/Tiles/FlatAngledInv.png", /* hitboxes. Tomt på højre */ {}, 1, 1);
+    AddTile(4, "assets/Tiles/Grass.png", /* hitboxes. Tomt på venstre */ {}, 1, 1);
+    AddTile(5, "assets/Tiles/InnerTurn.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
+    AddTile(6, "assets/Tiles/OuterTurn.png", /* hitboxes. Tomt på venstre og højre */ {}, 1, 1);
+    AddTile(7, "assets/Tiles/Road.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
+    AddTile(8, "assets/Tiles/SlowInnerTurn.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
+    AddTile(9, "assets/Tiles/SlowInnerTurnInv.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
+    AddTile(10, "assets/Tiles/SlowOuterTurn.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
+    AddTile(11, "assets/Tiles/SlowOuterTurnInv.png", /* hitboxes. Tomt på højre og venstre */ {}, 1, 1);
 }
 
 TileSet::~TileSet() {
@@ -24,7 +24,17 @@ TileSet::~TileSet() {
     }
 }
 
-void TileSet::AddTile(int id, const std::string& imagePath, const std::vector<Hitbox>& hitboxes) {
+Tile* TileSet::GetTile(int id) const {
+    auto it = tiles.find(id);
+    if (it != tiles.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+
+
+void TileSet::AddTile(int id, const std::string& imagePath, const std::vector<Hitbox>& hitboxes, int width, int height) {
     SDL_Surface* tempSurface = IMG_Load(imagePath.c_str());
     if (!tempSurface) {
         std::cerr << "Failed to load image: " << IMG_GetError() << std::endl;
@@ -39,14 +49,6 @@ void TileSet::AddTile(int id, const std::string& imagePath, const std::vector<Hi
         return;
     }
 
-    Tile* tile = new Tile(id, texture, hitboxes, 0, 0);
+    Tile* tile = new Tile(id, texture, hitboxes, 0, 0, width, height);
     tiles[id] = tile;
-}
-
-Tile* TileSet::GetTile(int id) const {
-    auto it = tiles.find(id);
-    if (it != tiles.end()) {
-        return it->second;
-    }
-    return nullptr;
 }

@@ -40,7 +40,7 @@ public:
     bool running() { return isRunning; }
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
-    void DrawTileWithOpacity(SDL_Renderer *renderer, Tile *tile, int x, int y, Uint8 opacity) const;
+    void DrawTileWithOpacity(SDL_Renderer *renderer, Tile *tile, int x, int y, int opacity) const;
     SDL_Rect GetAvailableTileRect(int tileIndex) const;
 
     bool isInsideGrid(int x, int y) const;
