@@ -183,10 +183,8 @@ void LevelEditor::RotateTile(int x, int y)
         int tileWidth = tileSet->GetTile(tileData.id)->GetWidth();
         int tileHeight = tileSet->GetTile(tileData.id)->GetHeight();
 
-
-
         if (tileData.id != 0) {
-            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees                  
+            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees
         }
     }
 }
@@ -351,8 +349,6 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
                 if (tile != nullptr) {
                     int tileWidth = tile->GetWidth();
                     int tileHeight = tile->GetHeight();
-
-                    
 
                     // Bare tegn flisen hvis det er øvre venstre hjørne av flisen
                     if (x % tileWidth == 0 && y % tileHeight == 0) {
