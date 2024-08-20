@@ -41,6 +41,7 @@ public:
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
     void DrawTileWithOpacity(SDL_Renderer *renderer, Tile *tile, int x, int y, Uint8 opacity) const;
+    void MarkSelectedRect(SDL_Rect selectedRect, int thickness, SDL_Renderer *renderer, int tileId) const;
     SDL_Rect GetAvailableTileRect(int tileIndex) const;
 
     bool isInsideGrid(int x, int y) const;
