@@ -11,6 +11,19 @@ Tile::Tile(int id, SDL_Texture* texture, const std::vector<Hitbox>& hitboxes, in
 /// @param gridShiftY height before the grid starts
 void Tile::Render(SDL_Renderer* renderer, int tileSize, int gridShiftX, int gridShiftY)
 {
+    SDL_Rect destRect = GetTileRectFromGrid(tileSize, gridShiftX, gridShiftY, gridX, gridY, rotation, width, height);
+
+    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, rotation, nullptr, SDL_FLIP_NONE);
+}
+
+
+/// @brief Return the rect of the tile
+/// @param tileSize
+/// @param gridShiftX 
+/// @param gridShiftY 
+/// @return 
+SDL_Rect GetTileRectFromGrid(int tileSize, int gridShiftX, int gridShiftY, int gridCoordX, int gridCoordY, int rotation, int width, int height)
+{
     // Change center based on rotation
     int offsetX = 0;
     int offsetY = 0;
@@ -26,12 +39,10 @@ void Tile::Render(SDL_Renderer* renderer, int tileSize, int gridShiftX, int grid
     }
 
     SDL_Rect destRect;
-    destRect.x = gridShiftX + gridX * tileSize + offsetX;
-    destRect.y = gridShiftY + gridY * tileSize + offsetY;
+    destRect.x = gridShiftX + gridCoordX * tileSize + offsetX;
+    destRect.y = gridShiftY + gridCoordY * tileSize + offsetY;
     destRect.w = width * tileSize;
     destRect.h = height * tileSize;
 
-    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, rotation, nullptr, SDL_FLIP_NONE);
+    return destRect;
 }
-
-

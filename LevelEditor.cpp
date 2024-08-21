@@ -174,20 +174,6 @@ void LevelEditor::PlaceTile(int gridX, int gridY) {
 
 void LevelEditor::RotateTile(int x, int y)
 {
-    if(isInsideGrid(x, y)){
-
-        // Find which tile is clicked
-        int tileX = (x - gridShiftX) / tileSize;
-        int tileY = (y - gridShiftY) / tileSize;
-
-        // Get the tile at that position
-        TileData& tileData = grid[tileY][tileX];
-
-        if (tileData.id != 0) {
-            tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees
-        }
-        
-    }
     if (selectedTileData.id != 0)
     {
         selectedTileData.rotation = (selectedTileData.rotation + 90) % 360;
@@ -334,12 +320,11 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
                     tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
                 }
             }
-            
 
             // Tegn den valgte flisen under musen med opasitet
-            if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileData.id != 0) {
+            if (x == hoverTileX && y == hoverTileY && selectedTileData.id != 0) {
                 if (selectedTileData.id != 0) {
-                    DrawTileWithOpacity(renderer, x, y, 150); // 150 er opasiteten (kan justeres)
+                    DrawTileWithOpacity(renderer, x, y, 70); // 150 er opasiteten (kan justeres)
                 }
             }
         }
@@ -429,27 +414,7 @@ void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, int gridX, int gri
     // Sett alpha (gjennomsiktighet)
     SDL_SetTextureAlphaMod(texture, opacity);
 
-    // Change center based on rotation
-    int offsetX = 0;
-    int offsetY = 0;
-    int height = tile->GetHeight();
-    int width = tile->GetWidth();
-    
-    if (height != width)
-    {
-        // Center point is changed based on rotation okayy less goo
-        if (selectedTileData.rotation == 90 || selectedTileData.rotation == 270)
-        {
-            offsetX = (height - width) * tileSize / 2;
-            offsetY = -(height - width) * tileSize / 2;
-        }
-    }
-
-    SDL_Rect destRect;
-    destRect.x = gridShiftX + gridX * tileSize + offsetX;
-    destRect.y = gridShiftY + gridY * tileSize + offsetY;
-    destRect.w = width * tileSize;
-    destRect.h = height * tileSize;
+    SDL_Rect destRect = GetTileRectFromGrid(tileSize, gridShiftX, gridShiftY, gridX, gridY, selectedTileData.rotation, tile->GetWidth(), tile->GetHeight());
     
     SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, selectedTileData.rotation, nullptr, SDL_FLIP_NONE);
 
@@ -461,6 +426,8 @@ void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, int gridX, int gri
 
 SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
 {
+    // Todo: Render different sized tiles!
+
     int xShift = 20;
     int yShift  = 20;
 
@@ -479,15 +446,6 @@ SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the t
 
     return rect;
 }
-
-/// @brief Checks if the given mouse coordinates are inside the grid
-/// @param x 
-/// @param y 
-/// @return 
-// bool LevelEditor::isInsideGrid(int x, int y) const
-// {
-//     return  x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
-// }
 
 bool LevelEditor::isInsideGrid(int x, int y) const {
     return x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && 
