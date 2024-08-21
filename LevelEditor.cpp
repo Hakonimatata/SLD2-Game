@@ -145,24 +145,28 @@ void LevelEditor::clean()
     cout << "Level editor cleaned" << endl;
 }
 
-void LevelEditor::PlaceTile(int x, int y, int tileID) {
-    Tile* tile = tileSet->GetTile(tileID);
-    if (tile) {
+void LevelEditor::PlaceTile(int gridX, int gridY) {
+
+    // Inputs are grid coordinates
+    
+    // Get tile 
+    Tile* tile = tileSet->GetTile(selectedTileData.id);
+
+    if (tile != nullptr) 
+    { 
         int tileWidth = tile->GetWidth();
         int tileHeight = tile->GetHeight();
 
-        // Sørg for at plasseringen er innenfor gridets grenser
-        for (int offsetY = 0; offsetY < tileHeight; ++offsetY) {
-            for (int offsetX = 0; offsetX < tileWidth; ++offsetX) {
-                int gridX = x + offsetX;
-                int gridY = y + offsetY;
-
-                // Sjekk om posisjonen er innenfor gridets grenser
-                if (gridX >= 0 && gridX < gridWidth && gridY >= 0 && gridY < gridHeight) {
-                    grid[gridY][gridX] = TileData(tileID, 0);
-                }
-            }
-        }
+        
+        // Check if in bounds (prevent tile to render outside)
+        if (gridX + tileWidth < gridWidth || gridY + tileHeight < gridHeight) 
+        {
+            // The whole tile is within bounds of grid!
+            grid[gridY][gridX] = TileData(selectedTileData.id, selectedTileData.rotation);
+            
+            // Remove tiles surrounding
+            // todo: implement
+        }   
     }
 }
 
@@ -179,13 +183,14 @@ void LevelEditor::RotateTile(int x, int y)
         // Get the tile at that position
         TileData& tileData = grid[tileY][tileX];
 
-        // Get tile size
-        int tileWidth = tileSet->GetTile(tileData.id)->GetWidth();
-        int tileHeight = tileSet->GetTile(tileData.id)->GetHeight();
-
         if (tileData.id != 0) {
             tileData.rotation = (tileData.rotation + 90) % 360; // Rotate 90 degrees
         }
+        
+    }
+    if (selectedTileData.id != 0)
+    {
+        selectedTileData.rotation = (selectedTileData.rotation + 90) % 360;
     }
 }
 
@@ -309,61 +314,32 @@ void LevelEditor::LoadLevel(const std::string& filename) {
     ifs.close();
 }
 
-// void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
-//     for (int y = 0; y < gridHeight; ++y) {
-//         for (int x = 0; x < gridWidth; ++x) {
-//             const TileData& tileData = grid[y][x];
-//             int drawX = gridShiftX + x * tileSize;
-//             int drawY = gridShiftY + y * tileSize;
-
-//             // Tegn flisene som allerede er plassert
-//             if (tileData.id != 0) {
-//                 Tile* tile = tileSet->GetTile(tileData.id);
-//                 if (tile != nullptr) {
-//                     tile->SetGridPosition(x, y);
-//                     tile->SetRotation(tileData.rotation);
-//                     tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
-//                 }
-//             }
-
-//             // Tegn den valgte flisen under musen med opasitet
-//             if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileID != 0) {
-//                 Tile* selectedTile = tileSet->GetTile(selectedTileID);
-//                 if (selectedTile != nullptr) {
-//                     DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150);
-//                 }
-//             }
-//         }
-//     }
-// }
 void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
     for (int y = 0; y < gridHeight; ++y) {
         for (int x = 0; x < gridWidth; ++x) {
             const TileData& tileData = grid[y][x];
-            int drawX = gridShiftX + x * tileSize;
-            int drawY = gridShiftY + y * tileSize;
+
 
             // Tegn flisene som allerede er plassert
             if (tileData.id != 0) {
                 Tile* tile = tileSet->GetTile(tileData.id);
                 if (tile != nullptr) {
+
                     int tileWidth = tile->GetWidth();
                     int tileHeight = tile->GetHeight();
 
-                    // Bare tegn flisen hvis det er øvre venstre hjørne av flisen
-                    if (x % tileWidth == 0 && y % tileHeight == 0) {
-                        tile->SetGridPosition(x, y);
-                        tile->SetRotation(tileData.rotation);
-                        tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
-                    }
+                    // Time to draw the tiles!
+                    tile->SetGridPosition(x, y);
+                    tile->SetRotation(tileData.rotation);
+                    tile->Render(renderer, tileSize, gridShiftX, gridShiftY);
                 }
             }
+            
 
             // Tegn den valgte flisen under musen med opasitet
-            if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileID != 0) {
-                Tile* selectedTile = tileSet->GetTile(selectedTileID);
-                if (selectedTile != nullptr) {
-                    DrawTileWithOpacity(renderer, selectedTile, drawX, drawY, 150); // 150 er opasiteten (kan justeres)
+            if (tileData.id == 0 && x == hoverTileX && y == hoverTileY && selectedTileData.id != 0) {
+                if (selectedTileData.id != 0) {
+                    DrawTileWithOpacity(renderer, x, y, 150); // 150 er opasiteten (kan justeres)
                 }
             }
         }
@@ -394,11 +370,11 @@ void LevelEditor::HandleLefttMouseClick(int x, int y)
     // Placing tiles
     if(isInsideGrid(x, y)){
         // Find which tile is clicked
-        int tileX = (x - gridShiftX) / tileSize;
-        int tileY = (y - gridShiftY) / tileSize;
+        int gridX = (x - gridShiftX) / tileSize;
+        int gridY = (y - gridShiftY) / tileSize;
 
-        if(selectedTileID != 0){
-            PlaceTile(tileX, tileY, selectedTileID);
+        if(selectedTileData.id != 0){
+            PlaceTile(gridX, gridY);
         }
     }
     
@@ -408,10 +384,12 @@ void LevelEditor::HandleLefttMouseClick(int x, int y)
         SDL_Rect tileRect = GetAvailableTileRect(i); // Bruker GetAvailableTileRect for å finne posisjon
 
         // Sjekk om klikket er innenfor denne tile
-        if (x >= tileRect.x && x < tileRect.x + tileRect.w &&
-            y >= tileRect.y && y < tileRect.y + tileRect.h) {
-            // Klikket er innenfor denne tile, så oppdater den valgte tile-ID-en
-            selectedTileID = pair.first; // ID-en for den valgte tile
+        if (x >= tileRect.x && x < tileRect.x + tileRect.w && y >= tileRect.y && y < tileRect.y + tileRect.h) {
+           
+            // Update selected tile data 
+            int tileId = pair.first;
+            selectedTileData = TileData(tileId);
+
             break; // Avslutt loopen når vi har funnet den valgte tile
         }
 
@@ -443,14 +421,37 @@ void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
     }
 }
 
-void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, Tile* tile, int x, int y, int opacity) const {
-    SDL_Texture* texture = tile->GetTexture();
+void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, int gridX, int gridY, int opacity) const {
     
+    Tile* tile = tileSet->GetTile(selectedTileData.id);
+    SDL_Texture* texture = tile->GetTexture(); 
+
     // Sett alpha (gjennomsiktighet)
     SDL_SetTextureAlphaMod(texture, opacity);
 
-    SDL_Rect destRect = { x, y, tileSize * tile->GetWidth(), tileSize * tile->GetHeight()};
-    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, tile->GetRotation(), nullptr, SDL_FLIP_NONE);
+    // Change center based on rotation
+    int offsetX = 0;
+    int offsetY = 0;
+    int height = tile->GetHeight();
+    int width = tile->GetWidth();
+    
+    if (height != width)
+    {
+        // Center point is changed based on rotation okayy less goo
+        if (selectedTileData.rotation == 90 || selectedTileData.rotation == 270)
+        {
+            offsetX = (height - width) * tileSize / 2;
+            offsetY = -(height - width) * tileSize / 2;
+        }
+    }
+
+    SDL_Rect destRect;
+    destRect.x = gridShiftX + gridX * tileSize + offsetX;
+    destRect.y = gridShiftY + gridY * tileSize + offsetY;
+    destRect.w = width * tileSize;
+    destRect.h = height * tileSize;
+    
+    SDL_RenderCopyEx(renderer, texture, nullptr, &destRect, selectedTileData.rotation, nullptr, SDL_FLIP_NONE);
 
     // Sett alpha tilbake til fullt synlig for å unngå at andre fliser også blir påvirket
     SDL_SetTextureAlphaMod(texture, 255);

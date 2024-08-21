@@ -29,7 +29,7 @@ public:
     bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
     void initButtons();
 
-    void PlaceTile(int x, int y, int tileID);
+    void PlaceTile(int x, int y);
     void RotateTile(int x, int y);
     void SaveLevel(const string& filename) const;
     void LoadLevel(const string& filename);
@@ -40,14 +40,14 @@ public:
     bool running() { return isRunning; }
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
-    void DrawTileWithOpacity(SDL_Renderer *renderer, Tile *tile, int x, int y, int opacity) const;
+    void DrawTileWithOpacity(SDL_Renderer *renderer, int x, int y, int opacity) const;
     SDL_Rect GetAvailableTileRect(int tileIndex) const;
 
     bool isInsideGrid(int x, int y) const;
 
 private:
 
-    int selectedTileID = 0; // 0 = nothing selected
+    TileData selectedTileData = TileData(); // Nothing selected as standard
 
     bool isRunning;
     SDL_Window* window;

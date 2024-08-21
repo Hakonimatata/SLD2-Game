@@ -5,7 +5,7 @@
 TileSet::TileSet(SDL_Renderer* renderer) : renderer(renderer) 
 {
     // Load tiles
-    AddTile(1, "assets/Tiles/Flat.png", /* hitboxes. Tomt nå */ {}, 1, 2);
+    AddTile(1, "assets/Tiles/Flat.png", /* hitboxes. Tomt nå */ {}, 1, 2); // Width = 1, Height = 2
     AddTile(2, "assets/Tiles/FlatAngled.png", /* hitboxes. Tomt nå */ {}, 1, 1);
     AddTile(3, "assets/Tiles/FlatAngledInv.png", /* hitboxes. Tomt på højre */ {}, 1, 1);
     AddTile(4, "assets/Tiles/Grass.png", /* hitboxes. Tomt på venstre */ {}, 1, 1);
