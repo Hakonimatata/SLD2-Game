@@ -179,27 +179,11 @@ void Car::Accelerate()
 
 void Car::Reverse()
 {
-    // Todo: Fix reverse. It only breaks the car at the moment
+    // Todo: Add reverse. It only breaks the car at the moment
 
-    /*
-    float reverseAccel = -0.5f * acceleration;
-    velocity.x += reverseAccel * cos(angle);
-    velocity.y += reverseAccel * sin(angle);
-
-    // Restrict speed by top speeed
-    if (velocity.getSize() > topSpeed)
-    {
-        velocity.normalize();
-        velocity.x *= topSpeed;
-        velocity.y *= topSpeed;
-    }
-    */
-
-   // Apply friction for  breaking
+    // Apply friction for  breaking
     velocity.x -= velocity.x * friction * 4 * deltaTime;
     velocity.y -= velocity.y * friction * 4 * deltaTime;
-
-
 }
 
 /// @brief Dynamisk endrer grepet til hjulene mellom drifting
@@ -273,7 +257,6 @@ void Car::ApplyFriction()
 {
     velocity.x -= velocity.x * friction * deltaTime;
     velocity.y -= velocity.y * friction * deltaTime;
-    cout << deltaTime * friction << endl;
 }
 
 void Car::RestrictSpeedToTopSpeed()

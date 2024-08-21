@@ -39,7 +39,7 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
     initPlayerControls();
 
     // Get the tileset with textures for the tiles
-    tileSet = new TileSet(renderer);
+    tileSet = new TileSet(renderer); // Idea: switch case for different tilesets
 
     // Load the level
     loadLevel("Levels/level.txt");
