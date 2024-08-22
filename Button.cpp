@@ -3,7 +3,7 @@
 
 
 void renderButton(SDL_Renderer* renderer, Button& button) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Rød farge
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
     SDL_RenderFillRect(renderer, &button.rect);
 }
 

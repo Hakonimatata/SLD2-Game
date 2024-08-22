@@ -9,6 +9,8 @@
 #include "SDL_image.h"
 #include "Tile.hpp"
 
+using namespace std;
+
 class TileSet {
 public:
     TileSet(SDL_Renderer* renderer);
@@ -20,7 +22,7 @@ public:
     // Hent en tile basert på ID
     Tile* GetTile(int id) const;
 
-    std::map<int, Tile*> tiles;
+    map<int, Tile*> tiles;
 
 private:
     SDL_Renderer* renderer;

@@ -21,13 +21,13 @@ public:
     void handleEvents();
     void MooveCamera(const Uint8 *state);
     void update();
-    void updateCamera(); // Todo: implement to move map around
     void render();
     void clean();
 
     void init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
     bool initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen);
     void initButtons();
+    void updateButtonPositions();
 
     void PlaceTile(int x, int y);
     void RotateTile(int x, int y);
@@ -41,13 +41,16 @@ public:
 
     void DrawAvailableTiles(SDL_Renderer* renderer) const;
     void DrawTileWithOpacity(SDL_Renderer *renderer, int x, int y, int opacity) const;
-    SDL_Rect GetAvailableTileRect(int tileIndex) const;
+    SDL_Rect GetAvailableTileRect(int tileIndex, const Tile* tile) const;
 
     bool isInsideGrid(int x, int y) const;
 
 private:
 
     TileData selectedTileData = TileData(); // Nothing selected as standard
+    TileDimentions showTileDimention = TileDimentions::None;
+    void CycleAvalableTileSize();
+    bool ShouldDrawTile(const Tile *tile) const;
 
     bool isRunning;
     SDL_Window* window;
@@ -68,8 +71,6 @@ private:
     vector<Button> buttons;
 
 };
-
-
 
 
 #endif // LEVELEDITOR_HPP

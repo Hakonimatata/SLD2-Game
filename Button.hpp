@@ -11,6 +11,10 @@ struct Button {
     SDL_Rect rect;                            // Knappens område
     std::function<void()> onClick;            // Funksjonsobjekt som kan holde hvilken som helst callable
 
+    void updateRect(SDL_Rect& rect) {
+        this->rect = rect;
+    }
+
     void execute() {
         if (onClick) {
             onClick();                        // Kall den bundne funksjonen

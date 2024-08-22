@@ -114,6 +114,7 @@ void LevelEditor::MooveCamera(const Uint8* state)
 void LevelEditor::update()
 {
     // Todo: Update camera?
+    updateButtonPositions(); 
 }
 
 void LevelEditor::render()
@@ -265,11 +266,29 @@ bool LevelEditor::initSDL(const char* title, int xPos, int yPos, int width, int 
 
 void LevelEditor::initButtons()
 {
-    Button button1;
-    button1.rect = { gridShiftX, gridShiftY + gridHeight * tileSize, 200, 100 }; // xPos, yPos, width, height
-    // addCallback(button1, this, &LevelEditor::Function); // Replace Function with a void method without inputs
-    buttons.push_back(button1);
+    Button cycleTilesButton;
+    cycleTilesButton.rect = { WinW - 140, 20, 100, 50 }; // xPos, yPos, width, height
+    addCallback(cycleTilesButton, this, &LevelEditor::CycleAvalableTileSize);
+    buttons.push_back(cycleTilesButton);
+    // ---------------------------------------------------------
+
+    // Add more buttons here
+
 }
+
+void LevelEditor::updateButtonPositions()
+{
+
+    if (!buttons.empty()) {
+        // Update the position of cycleTilesButton
+        SDL_Rect newRect = { WinW - 140, 20, 100, 50 };
+        buttons[0].updateRect(newRect);
+
+
+        // Add updates for more buttons here
+    }
+}
+
 
 void LevelEditor::LoadLevel(const std::string& filename) {
     std::ifstream ifs(filename);
@@ -336,7 +355,6 @@ void LevelEditor::DrawMap(SDL_Renderer* renderer) const {
 
 void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
 {
-    // Setter fargen for linjen (RGB: 255, 0, 0, full opasitet)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);  // Background color
     SDL_RenderClear(renderer);
 
@@ -352,58 +370,121 @@ void LevelEditor::DrawGrid(SDL_Renderer *renderer) const
 
 void LevelEditor::HandleLefttMouseClick(int x, int y)
 {
-    // Placing tiles
-    if(isInsideGrid(x, y)){
-        // Find which tile is clicked
+    // ------ Placing tiles ------
+
+    if (isInsideGrid(x, y)) {
+        // Get grid coordinates
         int gridX = (x - gridShiftX) / tileSize;
         int gridY = (y - gridShiftY) / tileSize;
 
-        if(selectedTileData.id != 0){
+        if (selectedTileData.id != 0) {
             PlaceTile(gridX, gridY);
         }
     }
-    
-    // Selection of tiles
-    int i = 0; // Indeks for tile
-    for (const auto& pair : tileSet->tiles) {
-        SDL_Rect tileRect = GetAvailableTileRect(i); // Bruker GetAvailableTileRect for å finne posisjon
+    else
+    {
+        // ------ Select tiles ------
 
-        // Sjekk om klikket er innenfor denne tile
-        if (x >= tileRect.x && x < tileRect.x + tileRect.w && y >= tileRect.y && y < tileRect.y + tileRect.h) {
-           
-            // Update selected tile data 
-            int tileId = pair.first;
-            selectedTileData = TileData(tileId);
+        int i = 0;
+        for (const auto& pair : tileSet->tiles) {
 
-            break; // Avslutt loopen når vi har funnet den valgte tile
+            Tile* tile = pair.second;
+
+            if (tile == nullptr || !ShouldDrawTile(tile)) continue;
+
+            SDL_Rect tileRect = GetAvailableTileRect(i, tile);
+
+            if (x >= tileRect.x && x < tileRect.x + tileRect.w && y >= tileRect.y && y < tileRect.y + tileRect.h) {
+                selectedTileData = TileData(pair.first);
+                break;
+            }
+
+            i++;
         }
 
-        i++; // Gå til neste tile
-    }
+        // ------ Handle button click ------
 
-    handleButtonClick(x, y, buttons);
-    
+        handleButtonClick(x, y, buttons);
+    }
 }
 
-void LevelEditor::DrawAvailableTiles(SDL_Renderer *renderer) const
+
+/**
+ * Draws all available tiles in the tile set to the given renderer.
+ *
+ * @param renderer The SDL renderer to draw the tiles to.
+ *
+ * @return None
+ *
+ * @throws None
+ */
+void LevelEditor::DrawAvailableTiles(SDL_Renderer* renderer) const
 {
-    
-    int i = 0; // tile id
+    int i = 0;
     for (const auto& pair : tileSet->tiles)
     {
         Tile* tile = pair.second;
 
-        if (tile != nullptr)
-        {
-            SDL_Rect destRect = GetAvailableTileRect(i);
-            SDL_Texture* texture = tile->GetTexture();
+        if (tile == nullptr || !ShouldDrawTile(tile)) continue;
 
-            // Draw to screen
-            SDL_RenderCopy(renderer, texture, NULL, &destRect);
+        SDL_Rect rect = GetAvailableTileRect(i, tile);
 
-            i++; // Next tile
-        }
+        SDL_Texture* texture = tile->GetTexture();
+
+        SDL_RenderCopy(renderer, texture, NULL, &rect);
+
+        i++;
     }
+}
+
+/**
+ * Determines whether the given tile should be drawn based on the current setting of the showTileDimention.
+ *
+ * @param tile A pointer to the tile object.
+ * @return A boolean indicating whether the tile should be drawn.
+ */
+bool LevelEditor::ShouldDrawTile(const Tile* tile) const
+{
+    switch (showTileDimention) {
+        case TileDimentions::OneByOne:
+            return (tile->GetWidth() == 1 && tile->GetHeight() == 1);
+        case TileDimentions::OneByTwo:
+            return (tile->GetWidth() == 1 && tile->GetHeight() == 2);
+        default:
+            return false;
+    }
+}
+
+/**
+ * Calculates the position and dimensions of a tile in the available tile list.
+ *
+ * @param tileIndex The index of the tile in the available tile list.
+ * @param tile A pointer to the tile object.
+ *
+ * @return An SDL_Rect representing the position and dimensions of the tile.
+ */
+SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex, const Tile* tile) const
+{
+    int tileWidth = tile->GetWidth();
+    int tileHeight = tile->GetHeight();
+
+    int xShift = 40;
+    int yShift = 100;
+    int spaceBetweenTiles = 5;
+
+    int maxRows = (WinH - 2 * yShift) / (tileSize * tileHeight + spaceBetweenTiles);
+    if (maxRows <= 0) { maxRows = 1; } // prevents crash
+
+    int xPosition = WinW - xShift - (tileSize * tileWidth + spaceBetweenTiles) - (tileSize * tileWidth + spaceBetweenTiles) * (tileIndex / maxRows);
+    int yPosition = yShift + (tileIndex % maxRows) * (tileSize * tileHeight + spaceBetweenTiles);
+
+    SDL_Rect rect;
+    rect.x = xPosition;
+    rect.y = yPosition;
+    rect.w = tileSize * tileWidth;
+    rect.h = tileSize * tileHeight;
+
+    return rect;
 }
 
 void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, int gridX, int gridY, int opacity) const {
@@ -423,31 +504,26 @@ void LevelEditor::DrawTileWithOpacity(SDL_Renderer* renderer, int gridX, int gri
 }
 
 
-
-SDL_Rect LevelEditor::GetAvailableTileRect(int tileIndex) const // Defines the tile selection grid
-{
-    // Todo: Render different sized tiles!
-
-    int xShift = 20;
-    int yShift  = 20;
-
-    int spaceBetweenTiles = 5;
-    int maxRows = (WinH - 2 * yShift) / (tileSize + spaceBetweenTiles);
-    if (maxRows <= 0){maxRows = 1;} // prevents crash
-
-    int xPosition = WinW - xShift - (tileSize + spaceBetweenTiles) - (tileSize + spaceBetweenTiles) * (tileIndex / maxRows);
-    int yPosition = yShift + (tileIndex % maxRows) * (tileSize + spaceBetweenTiles); 
-
-    SDL_Rect rect;
-    rect.x = xPosition;
-    rect.y = yPosition;
-    rect.w = tileSize;
-    rect.h = tileSize;
-
-    return rect;
-}
-
 bool LevelEditor::isInsideGrid(int x, int y) const {
     return x >= gridShiftX && x < gridShiftX + gridWidth * tileSize && 
            y >= gridShiftY && y < gridShiftY + gridHeight * tileSize;
+}
+
+void LevelEditor::CycleAvalableTileSize()
+{
+    switch (showTileDimention)
+    {
+        case TileDimentions::OneByOne:
+            showTileDimention = TileDimentions::OneByTwo;
+            break;
+
+        case TileDimentions::OneByTwo:
+            showTileDimention = TileDimentions::OneByOne;
+            break;
+
+        case TileDimentions::None:
+        default:
+            showTileDimention = TileDimentions::OneByOne;
+            break;
+    }
 }

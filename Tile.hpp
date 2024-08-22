@@ -42,11 +42,16 @@ private:
 };
 
 
-
 // Get the rect of the tile
 SDL_Rect GetTileRectFromGrid(int tileSize, int gridShiftX, int gridShiftY, int gridCoordX, int gridCoordY, int rotation, int width, int height);
 
 
+enum class TileDimentions
+{
+    None = 0,
+    OneByOne = 1,
+    OneByTwo = 2
+};
 
 struct TileData {
     int id;

@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
     
     // Initialize Game
     bool twoPlayerMode = false;
-    game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false, twoPlayerMode);
+    bool fullscreen = false;
+    game->init("Title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, fullscreen, twoPlayerMode);
 
     while (game->running())
     {
