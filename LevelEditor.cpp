@@ -450,6 +450,8 @@ bool LevelEditor::ShouldDrawTile(const Tile* tile) const
             return (tile->GetWidth() == 1 && tile->GetHeight() == 1);
         case TileDimentions::OneByTwo:
             return (tile->GetWidth() == 1 && tile->GetHeight() == 2);
+        case TileDimentions::TwoByTwo:
+            return (tile->GetWidth() == 2 && tile->GetHeight() == 2);
         default:
             return false;
     }
@@ -518,6 +520,10 @@ void LevelEditor::CycleAvalableTileSize()
             break;
 
         case TileDimentions::OneByTwo:
+            showTileDimention = TileDimentions::TwoByTwo;
+            break;
+
+        case TileDimentions::TwoByTwo:
             showTileDimention = TileDimentions::OneByOne;
             break;
 

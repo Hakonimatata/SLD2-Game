@@ -49,8 +49,9 @@ SDL_Rect GetTileRectFromGrid(int tileSize, int gridShiftX, int gridShiftY, int g
 enum class TileDimentions
 {
     None = 0,
-    OneByOne = 1,
-    OneByTwo = 2
+    OneByOne,
+    OneByTwo,
+    TwoByTwo
 };
 
 struct TileData {
