@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const int WIDTH = 800, HEIGHT = 500;
+const int WIDTH = 1200, HEIGHT = 700;
 
 
 int main(int argc, char* argv[])
