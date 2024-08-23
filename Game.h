@@ -29,8 +29,8 @@ class Game
 
     private:
         // Ajustable parameters
-        const float carScaleFactor = 0.4f;  // Currently used to set the scale of everything for the car (into the construcotr)
-        float tileSize = 64;                // Tilesize dictates the map size
+        const float carScaleFactor = 0.8f;  // Currently used to set the scale of everything for the car (into the construcotr)
+        float tileSize = 128.0f;                // Tilesize dictates the map size
 
         // Functions
         void resizeElements(int newWidth, int newHeight);

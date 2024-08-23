@@ -15,6 +15,26 @@ Game::~Game()
 
 void Game::init(const char* title, int xPos, int yPos, int width, int height, bool fullscreen, bool twoPlayerMode)
 {
+    // Init SDL first to set correct fullscreen resolution
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        cout << "SDL init failed: " << SDL_GetError() << endl;
+        return;
+    }
+
+    // Set fullscreen mode if needed
+    if (fullscreen) {
+        SDL_DisplayMode displayMode;
+        if (SDL_GetCurrentDisplayMode(0, &displayMode) != 0) {
+            std::cerr << "Failed to get current display mode: " << SDL_GetError() << std::endl;
+            isRunning = false;
+            return;
+        }
+        // Override width and height with the screen's resolution
+        width = displayMode.w;
+        height = displayMode.h;
+    }
+
     // Set current window size
     WinW = width;
     WinH = height;
@@ -54,14 +74,6 @@ void Game::init(const char* title, int xPos, int yPos, int width, int height, bo
 bool Game::initSDL(const char* title, int xPos, int yPos, int width, int height, bool fullscreen)
 {
     int flags = fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
-
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        cout << "SDL init failed: " << SDL_GetError() << endl;
-        return false;
-    }
-
-    cout << "SDL init success" << endl;
 
     window = SDL_CreateWindow(title, xPos, yPos, width, height, flags);
     if (!window)
