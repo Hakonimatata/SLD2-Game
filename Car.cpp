@@ -119,9 +119,31 @@ void Car::Update(float deltaTime)
 }
 
 void Car::Render(SDL_Renderer* renderer) {
-    // Draw player texture
-    SDL_RenderCopyEx(renderer, texture, NULL, &spriteRect, angle * 180.0f / M_PI + 90, NULL, SDL_FLIP_NONE);
+
+    SDL_Point center = {spriteRect.w / 2, spriteRect.h / 5};
+    // Start med det opprinnelige rotasjonssenteret (midt på bilen)
+
+    // Todo: endre senteret av bilen sitt rotasjonspunkt når den drifter
+
+    /*
+    // Sjekk om bilen drifter
+    if (isDrifting) {
+        // Forskyvning fra midten av bilen (hvor langt fremover vi skal flytte senteret)
+        int offset = spriteWidth / 5;
+        center.x += offset;
+
+        // Beregn ny posisjon for rotasjonssenteret basert på bilens rotasjonsvinkel
+        spriteRect.x -= static_cast<int>( 2 * offset * sin(0.5f * angle));
+        spriteRect.y += static_cast<int>(offset * sin(angle));
+    }
+    */
+
+    // Tegn bilen med justert senterpunkt
+    SDL_RenderCopyEx(renderer, texture, NULL, &spriteRect, angle * 180.0f / M_PI, &center, SDL_FLIP_NONE);
 }
+
+
+
 
 void Car::SetPosition(float x, float y) {
     posX = x;
@@ -277,9 +299,9 @@ void Car::RotateLeft()
 
     angle -= angleSpeed;
     
-    if(angle >= 2*M_PI)
+    if(angle < 0)
     {
-        angle -= 2*M_PI;
+       angle += 2*M_PI;
     } 
 }
 
@@ -288,10 +310,10 @@ void Car::RotateRight()
     float angleSpeed = GetAngleSpeed() * deltaTime;
 
     angle += angleSpeed;
-
-    if(angle < 0)
+    
+    if(angle >= 2*M_PI)
     {
-       angle += 2*M_PI;
+        angle -= 2*M_PI;
     } 
 }
 

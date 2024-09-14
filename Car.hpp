@@ -48,7 +48,7 @@ private:
     float acceleration = 0.2f;                  // Car gas acceleration
     float topSpeed;                             // Top speed of the car (set in constructor)
     float rotationSpeed = 0.15f;                // Rotation speed of the car 
-    float rotationMultiplierWhenDrift = 2.0f;   // Multiplier for rotation speed when drifting
+    float rotationMultiplierWhenDrift = 1.5f;   // Multiplier for rotation speed when drifting
     float friction = 0.01f;                     // Speed reduction when not accelerating
 
     // Physical properties not adjustable by user
@@ -61,8 +61,8 @@ private:
     float deltaTime;                         // current delta time from update() used to set speed
 
     // SDL properties
-    float spriteWidth = 40;    // Width of sprite
-    float spriteHeight = 90;   // Height of sprite
+    float spriteWidth = 80;    // Width of sprite
+    float spriteHeight = 40;   // Height of sprite
     SDL_Rect spriteRect;       // SDL_Rect for rendering
     SDL_Texture* texture;      // Car texture
 
